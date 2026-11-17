@@ -112,8 +112,8 @@
   .result { font-family: var(--font-mono); font-size: 13px; background: var(--code-bg); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; overflow-x: auto; white-space: pre; line-height: 1.5; }
   .result .ok { color: var(--ok); font-weight: 600; }
   .check { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; max-width: 68ch; }
-  .check li { display: grid; grid-template-columns: 22px 1fr; gap: 8px; }
-  .check li::before { content: ""; width: 16px; height: 16px; margin-top: 4px; border: 2px solid var(--accent); border-radius: 4px; }
+  .check li { position: relative; padding-left: 30px; }
+  .check li::before { content: ""; position: absolute; left: 0; top: 4px; width: 16px; height: 16px; border: 2px solid var(--accent); border-radius: 4px; }
   footer { font-size: 14px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 18px; display: grid; gap: 6px; }
 
   /* În plus față de proba3.html: machetele (Toast, câmp cu eroare) și schema layout → binding → activitate */
