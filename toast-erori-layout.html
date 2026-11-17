@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Toast, erori (setError și try/catch) și layout-uri în Android: din ce sunt făcute, unde le scrii și cum le apelezi, explicate pe proiectul Model_Proba3_DAM_Extins.">
+<title>Toast, erori, layout-uri</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+  /* Aceleași culori și fonturi ca ghidul Proba 3 */
+  :root {
+    --bg: #F4F6F2; --surface: #FFFFFF; --fg: #1B2220; --muted: #59645F; --line: #D9DFDA;
+    --accent: #0E6B5A; --accent-soft: #DFEFE9; --mark: #FFE36E; --mark-fg: #362B00;
+    --test: #5646C2; --test-soft: #EBE8FB; --code-bg: #EDF1EC; --ok: #1C7A3E; --bad: #B3261E;
+    --k: #8A3FB0; --s: #1F7A3A; --c: #76827D; --n: #B5521B; --t: #0E5C8C; --a: #8E6400;
+    --font-display: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+    --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, Consolas, "Courier New", monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #111614; --surface: #181E1C; --fg: #E2E8E4; --muted: #9AA7A2; --line: #2A3330;
+      --accent: #4CC2A6; --accent-soft: #15302A; --mark: #4B4013; --mark-fg: #FFE58A;
+      --test: #ADA1FF; --test-soft: #241F45; --code-bg: #0D1211; --ok: #6FD08F; --bad: #FF8A80;
+      --k: #D59DF2; --s: #8DD79C; --c: #72807B; --n: #F0A272; --t: #7CC1F0; --a: #E3B95A;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #111614; --surface: #181E1C; --fg: #E2E8E4; --muted: #9AA7A2; --line: #2A3330;
+    --accent: #4CC2A6; --accent-soft: #15302A; --mark: #4B4013; --mark-fg: #FFE58A;
+    --test: #ADA1FF; --test-soft: #241F45; --code-bg: #0D1211; --ok: #6FD08F; --bad: #FF8A80;
+    --k: #D59DF2; --s: #8DD79C; --c: #72807B; --n: #F0A272; --t: #7CC1F0; --a: #E3B95A;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.6; }
+  .wrap {
+    max-width: 880px; margin: 0 auto;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 40px 72px; display: grid; gap: 56px;
+  }
+  h1, h2, h3 { font-family: var(--font-display); line-height: 1.2; text-wrap: balance; margin: 0; }
+  h1 { font-size: clamp(30px, 5vw, 42px); font-weight: 700; letter-spacing: -0.01em; }
+  h2 { font-size: 26px; font-weight: 700; }
+  h3 { font-size: 19px; font-weight: 700; }
+  p { margin: 0; }
+  a { color: var(--accent); text-underline-offset: 3px; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  code, kbd { font-family: var(--font-mono); font-size: 0.88em; }
+  :not(pre) > code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+  kbd { display: inline-block; padding: 1px 7px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; background: var(--surface); white-space: nowrap; }
+  .eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  section { display: grid; gap: 20px; min-width: 0; }
+  .lead { font-size: 18px; color: var(--muted); max-width: 65ch; }
+  .prose { max-width: 68ch; display: grid; gap: 12px; }
+  .prose ul, .prose ol { margin: 0; padding-left: 22px; display: grid; gap: 6px; }
+  p.prose { display: block; }
+
+  header { display: grid; gap: 18px; }
+  .back { font-size: 14px; }
+  .funnel { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+  .funnel .step { flex: 1 1 160px; min-width: 0; padding: 14px 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); display: grid; gap: 2px; }
+  .funnel .num { font-family: var(--font-display); font-size: 34px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .funnel .lbl { font-size: 14px; color: var(--muted); }
+  .funnel .step.hot { background: var(--mark); border-color: transparent; }
+  .funnel .step.hot .num, .funnel .step.hot .lbl { color: var(--mark-fg); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; }
+  nav.toc a { text-decoration: none; }
+  nav.toc a:hover { text-decoration: underline; }
+
+  .req { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; scroll-margin-top: 16px; min-width: 0; }
+  .req-head { padding: 18px 20px 14px; display: grid; gap: 8px; border-bottom: 1px solid var(--line); }
+  .req-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+  .pts { font-family: var(--font-mono); font-size: 12px; padding: 1px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  .tst { font-family: var(--font-mono); font-size: 12px; padding: 1px 8px; border-radius: 999px; background: var(--test-soft); color: var(--test); font-weight: 600; }
+  .path { font-family: var(--font-mono); font-size: 13px; background: var(--mark); color: var(--mark-fg); padding: 4px 10px; border-radius: 6px; overflow-wrap: anywhere; justify-self: start; max-width: 100%; }
+  .req-body { padding: 18px 20px 20px; display: grid; gap: 18px; min-width: 0; }
+  .block { display: grid; gap: 8px; min-width: 0; }
+  .block > .eyebrow { color: var(--fg); font-weight: 600; }
+  .block ul, .block ol { margin: 0; padding-left: 22px; display: grid; gap: 6px; }
+  .traps { border-left: 3px solid var(--bad); padding: 10px 14px; background: color-mix(in srgb, var(--bad) 7%, var(--surface)); border-radius: 0 8px 8px 0; display: grid; gap: 6px; }
+  .traps .eyebrow { color: var(--bad); }
+
+  pre { margin: 0; background: var(--code-bg); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; overflow-x: auto; font-family: var(--font-mono); font-size: 13px; line-height: 1.55; tab-size: 4; }
+  pre code { font-size: inherit; }
+  .k { color: var(--k); font-weight: 600; } .s { color: var(--s); } .c { color: var(--c); font-style: italic; }
+  .n { color: var(--n); } .t { color: var(--t); } .a { color: var(--a); }
+
+  .io { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
+  .io > div { min-width: 0; display: grid; gap: 6px; align-content: start; }
+
+  .tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  th { font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); background: var(--code-bg); }
+  td code { white-space: nowrap; }
+  td a { text-decoration: none; }
+
+  .steps { margin: 0; padding-left: 24px; display: grid; gap: 10px; max-width: 68ch; }
+  .steps li::marker { font-family: var(--font-display); font-weight: 700; color: var(--accent); }
+  .callout { background: var(--accent-soft); border-radius: 12px; padding: 16px 18px; display: grid; gap: 8px; }
+  .callout.warn { background: color-mix(in srgb, var(--mark) 55%, var(--surface)); }
+  .callout ul { margin: 0; padding-left: 22px; display: grid; gap: 6px; }
+  .result { font-family: var(--font-mono); font-size: 13px; background: var(--code-bg); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; overflow-x: auto; white-space: pre; line-height: 1.5; }
+  .result .ok { color: var(--ok); font-weight: 600; }
+  .check { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; max-width: 68ch; }
+  .check li { display: grid; grid-template-columns: 22px 1fr; gap: 8px; }
+  .check li::before { content: ""; width: 16px; height: 16px; margin-top: 4px; border: 2px solid var(--accent); border-radius: 4px; }
+  footer { font-size: 14px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 18px; display: grid; gap: 6px; }
+
+  /* În plus față de proba3.html: machetele (Toast, câmp cu eroare) și schema layout → binding → activitate */
+  :root { --toast-bg: #2F3533; --toast-fg: #FFFFFF; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --toast-bg: #E2E8E4; --toast-fg: #111614; } }
+  :root[data-theme="dark"] { --toast-bg: #E2E8E4; --toast-fg: #111614; }
+
+  .back-row { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 14px; }
+  .demo { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; align-items: start; }
+  .demo-cap { font-size: 14px; color: var(--muted); }
+  .phone { position: relative; width: 100%; max-width: 280px; min-height: 230px; border: 1px solid var(--line); border-radius: 24px; background: var(--surface); padding: 12px; display: grid; gap: 8px; align-content: start; }
+  .phone .bar { background: var(--accent); color: var(--surface); font-family: var(--font-display); font-weight: 700; font-size: 14px; padding: 8px 12px; border-radius: 10px; }
+  .phone .row { height: 10px; border-radius: 5px; background: var(--line); }
+  .phone .row.short { width: 60%; }
+  .toast-pill { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); background: var(--toast-bg); color: var(--toast-fg); font-size: 13px; padding: 7px 16px; border-radius: 999px; white-space: nowrap; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18); }
+  .field { display: flex; align-items: center; justify-content: space-between; gap: 8px; border-bottom: 2px solid var(--bad); padding: 6px 2px; font-size: 14px; color: var(--muted); }
+  .field.ok { border-bottom-color: var(--line); color: var(--fg); }
+  .err-icon { flex: none; width: 18px; height: 18px; border-radius: 50%; background: var(--bad); color: var(--surface); font-weight: 700; font-size: 12px; line-height: 18px; text-align: center; }
+  .bubble { justify-self: end; max-width: 100%; font-size: 13px; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--bad); color: var(--bad); background: color-mix(in srgb, var(--bad) 8%, var(--surface)); }
+
+  .flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; }
+  .flow .node { flex: 1 1 180px; min-width: 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); display: grid; gap: 4px; }
+  .flow .node code { justify-self: start; overflow-wrap: anywhere; }
+  .flow .node span { font-size: 13px; color: var(--muted); }
+  .flow .arrow { align-self: center; font-family: var(--font-display); font-size: 22px; color: var(--accent); }
+  @media (max-width: 640px) { .flow { flex-direction: column; } .flow .node { flex: none; } .flow .arrow { transform: rotate(90deg); line-height: 1; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="back-row">
+      <a href="proba3.html">← Ghidul Proba 3 (pașii 1–11)</a>
+      <a href="./">← Primul ghid (Proba 1)</a>
+    </div>
+    <span class="eyebrow">Android · explicat pe proiectul Model_Proba3_DAM_Extins</span>
+    <h1>Toast, erori și layout-uri</h1>
+    <p class="lead">Ce sunt, din ce bucăți sunt făcute, unde le scrii și cum le apelezi. Exemplele sunt luate din <code>MainActivity</code>, <code>AddActivity</code> și <code>activity_add.xml</code>.</p>
+    <nav class="toc" aria-label="Cuprins">
+      <a href="#pe-scurt">Pe scurt</a>
+      <a href="#toast">Toast</a>
+      <a href="#seterror">Erori pe câmpuri (setError)</a>
+      <a href="#trycatch">Erori care crapă aplicația (try/catch)</a>
+      <a href="#layout">Layout-uri</a>
+      <a href="#capcane">Capcane</a>
+    </nav>
+  </header>
+
+  <!-- PE SCURT -->
+  <section id="pe-scurt" aria-labelledby="h-scurt">
+    <span class="eyebrow">Toate trei într-un tabel</span>
+    <h2 id="h-scurt">Pe scurt</h2>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>Ce</th><th>Ce vede utilizatorul</th><th>Unde îl scrii</th><th>Cum îl apelezi</th></tr></thead>
+        <tbody>
+          <tr><td><a href="#toast">Toast</a></td><td>mesaj mic jos, dispare singur</td><td>oriunde în activitate: <code>onCreate</code>, click, <code>catch</code></td><td><code>Toast.makeText(this, "…", Toast.LENGTH_SHORT).show();</code></td></tr>
+          <tr><td><a href="#seterror">setError</a></td><td>„!” roșu pe un câmp de text</td><td>în metoda butonului, înainte să creezi obiectul</td><td><code>binding.etTitlu.setError("…");</code></td></tr>
+          <tr><td><a href="#trycatch">try/catch</a></td><td>nimic, sau un Toast cu eroarea; aplicația nu se mai închide</td><td>în jurul codului riscant: parse, citire fișier</td><td><code>try { … } catch (Exception e) { … }</code></td></tr>
+          <tr><td><a href="#layout">Layout</a></td><td>tot ecranul</td><td>fișier XML în <code>res/layout/</code></td><td>în <code>onCreate</code>: <code>inflate</code> + <code>setContentView</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- TOAST -->
+  <section id="toast" aria-labelledby="h-toast">
+    <span class="eyebrow">1 · Mesaje scurte</span>
+    <h2 id="h-toast">Toast</h2>
+
+    <div class="demo">
+      <div class="block">
+        <div class="phone" role="img" aria-label="Ecran de telefon cu un Toast jos: Anunț salvat!">
+          <div class="bar">Anunțuri</div>
+          <div class="row"></div><div class="row short"></div>
+          <div class="row"></div><div class="row short"></div>
+          <div class="toast-pill">Anunț salvat!</div>
+        </div>
+        <p class="demo-cap">Toast-ul apare jos pe ecran și dispare singur după 2–3 secunde. Utilizatorul nu trebuie să apese nimic.</p>
+      </div>
+      <div class="block">
+        <span class="eyebrow">Linia care îl face</span>
+<pre><code data-lang="java">Toast.makeText(this, "Anunț salvat!", Toast.LENGTH_SHORT).show();</code></pre>
+        <p class="prose">Ai nevoie de <code>import android.widget.Toast;</code> sus în fișier. Dacă <code>Toast</code> e roșu, apeși <kbd>Alt</kbd>+<kbd>Enter</kbd> și ți-l adaugă Android Studio.</p>
+      </div>
+    </div>
+
+    <div class="tbl">
+      <table>
+        <thead><tr><th>Bucata</th><th>Ce face</th><th>Ce pui acolo</th></tr></thead>
+        <tbody>
+          <tr><td><code>Toast.makeText(…)</code></td><td>creează toast-ul, dar încă nu-l afișează</td><td>–</td></tr>
+          <tr><td><code>this</code></td><td><strong>contextul</strong>: activitatea în care ești</td><td><code>this</code>, <code>MainActivity.this</code> sau <code>context</code> (vezi mai jos)</td></tr>
+          <tr><td>mesajul</td><td>textul afișat, un <code>String</code></td><td><code>"Importate: " + importate.size()</code></td></tr>
+          <tr><td>durata</td><td>cât stă pe ecran</td><td><code>Toast.LENGTH_SHORT</code> (~2 s) sau <code>Toast.LENGTH_LONG</code> (~3,5 s)</td></tr>
+          <tr><td><code>.show()</code></td><td>îl afișează</td><td><strong>obligatoriu</strong>: fără el nu apare nimic</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="block">
+      <span class="eyebrow">Unde îl apelezi</span>
+      <p class="prose">Oriunde în codul activității care chiar rulează. Cele patru locuri din proiect:</p>
+<pre><code data-lang="java">// 1. la pornirea ecranului: în onCreate, după setContentView (MainActivity)
+int ultimaIncarcare = PreferinteService.citesteNrIncarcate(getPrefs());
+Toast.makeText(this, "Ultima încărcare: " + ultimaIncarcare, Toast.LENGTH_LONG).show();
+
+// 2. la click pe un buton
+binding.btnSalveaza.setOnClickListener(v -&gt; {
+    Toast.makeText(this, "Ai apăsat Salvează", Toast.LENGTH_SHORT).show();
+});
+
+// 3. după o acțiune: la finalul lui importa() (MainActivity)
+Toast.makeText(this, "Importate: " + importate.size(), Toast.LENGTH_SHORT).show();
+
+// 4. într-un catch, ca să spui că ceva n-a mers (MainActivity, meniul de import)
+catch (Exception e) {
+    Toast.makeText(this, "Eroare la import: " + e.getMessage(), Toast.LENGTH_LONG).show();
+}</code></pre>
+    </div>
+
+    <div class="block">
+      <span class="eyebrow">Ce pui la context</span>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Unde scrii Toast-ul</th><th>Primul argument</th><th>De ce</th></tr></thead>
+          <tbody>
+            <tr><td>direct în activitate sau într-o lambda <code>v -&gt; { … }</code></td><td><code>this</code></td><td><code>this</code> e chiar activitatea</td></tr>
+            <tr><td>într-o clasă anonimă <code>new View.OnClickListener() { … }</code></td><td><code>MainActivity.this</code></td><td>acolo <code>this</code> e listener-ul, nu activitatea</td></tr>
+            <tr><td>în adapter sau în altă clasă care nu e activitate</td><td><code>context</code></td><td>câmpul primit în constructor (în <code>AnuntAdapter</code> se cheamă <code>context</code>)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="traps">
+      <span class="eyebrow">Capcană: număr gol în loc de text</span>
+<pre><code data-lang="java">Toast.makeText(this, anunturi.size(), Toast.LENGTH_SHORT).show();           // CRAPĂ
+Toast.makeText(this, "Total: " + anunturi.size(), Toast.LENGTH_SHORT).show(); // OK</code></pre>
+      <p>Compilează, dar crapă când rulează. Un <code>int</code> gol e luat drept id de resursă (<code>R.string.ceva</code>), iar resursa nu există, așa că primești <code>Resources$NotFoundException</code>. Lipește mereu numărul de un text.</p>
+    </div>
+  </section>
+
+  <!-- SETERROR -->
+  <section id="seterror" aria-labelledby="h-seterror">
+    <span class="eyebrow">2 · Erori, felul A</span>
+    <h2 id="h-seterror">Erori pe câmpuri: <code>setError</code></h2>
+
+    <div class="demo">
+      <div class="block">
+        <div class="phone" role="img" aria-label="Formular cu câmpul Titlu gol, marcat cu un semn de exclamare roșu și mesajul Titlul este obligatoriu">
+          <div class="bar">Anunț nou</div>
+          <div class="field"><span>Titlu</span><span class="err-icon">!</span></div>
+          <div class="bubble">Titlul este obligatoriu</div>
+          <div class="field ok"><span>Laptop folosit, stare bună</span></div>
+          <div class="field ok"><span>1200</span></div>
+        </div>
+        <p class="demo-cap">Câmpul primește un „!” roșu la capăt. Când dai click pe el, apare balonul cu mesajul.</p>
+      </div>
+      <div class="block">
+        <span class="eyebrow">Cum o pui și cum o ștergi</span>
+<pre><code data-lang="java">binding.etTitlu.setError("Titlul este obligatoriu"); // pune eroarea
+binding.etTitlu.setError(null);                       // o șterge</code></pre>
+        <p class="prose"><code>setError</code> există pe <code>EditText</code> (și pe <code>TextView</code>). <strong>Spinner-ul și CheckBox-ul nu au</strong> <code>setError</code>: pentru ele folosești un Toast.</p>
+      </div>
+    </div>
+
+    <div class="block">
+      <span class="eyebrow">Unde o apelezi: în metoda butonului de salvare, mereu în ordinea asta</span>
+      <ol class="steps">
+        <li>Citești textul din câmpuri: <code>binding.etTitlu.getText().toString()</code>.</li>
+        <li>Verifici fiecare câmp.</li>
+        <li>Pui <code>setError</code> pe câmpurile greșite.</li>
+        <li>Dacă e vreo eroare: <code>return;</code> și te oprești aici.</li>
+        <li>Altfel construiești obiectul, apoi <code>putExtra</code>, <code>setResult</code>, <code>finish</code>.</li>
+      </ol>
+    </div>
+
+    <h3>Varianta simplă, fără validator separat</h3>
+<pre><code data-lang="java">private void salveaza() {
+    String titlu = binding.etTitlu.getText().toString();
+    String pretText = binding.etPret.getText().toString();
+    boolean ok = true;
+
+    if (titlu.trim().isEmpty()) {
+        binding.etTitlu.setError("Titlul este obligatoriu");
+        ok = false;
+    }
+
+    try {
+        double pret = Double.parseDouble(pretText);
+        if (pret &lt;= 0) {
+            binding.etPret.setError("Prețul trebuie să fie mai mare ca 0");
+            ok = false;
+        }
+    } catch (NumberFormatException e) {
+        binding.etPret.setError("Preț invalid");
+        ok = false;
+    }
+
+    if (!ok) return;   // NU mergi mai departe
+    // ... aici construiești Anunt-ul
+}</code></pre>
+    <p class="prose">Folosești variabila <code>ok</code> în loc de <code>return</code> la prima eroare ca să apară erorile pe <strong>toate</strong> câmpurile deodată, nu pe rând.</p>
+
+    <h3>Varianta din proiect (<code>AddActivity</code> + <code>FormularValidator</code>)</h3>
+    <p class="prose"><code>FormularValidator.erori(...)</code> verifică tot și întoarce un <code>Map</code>: cheia e numele câmpului, valoarea e mesajul. Câmpurile corecte nu apar deloc în map.</p>
+<pre><code data-lang="java">Map&lt;String, String&gt; erori = FormularValidator.erori(titlu, descriere,
+        pretText, cantitateText, categorieText, dataText);
+
+// erori.get("titlu") dă mesajul, sau null dacă titlul e bun.
+// setError(null) șterge eroarea veche, deci o linie face ambele.
+binding.etTitlu.setError(erori.get("titlu"));
+binding.etDescriere.setError(erori.get("descriere"));
+binding.etPret.setError(erori.get("pret"));
+binding.etCantitate.setError(erori.get("cantitate"));
+binding.etData.setError(erori.get("data"));
+
+if (erori.containsKey("categorie")) {
+    // Spinner-ul nu are setError, așa că anunțăm prin Toast
+    Toast.makeText(this, erori.get("categorie"), Toast.LENGTH_SHORT).show();
+}
+if (!erori.isEmpty()) {
+    return; // NU continuăm dacă există erori
+}</code></pre>
+  </section>
+
+  <!-- TRY/CATCH -->
+  <section id="trycatch" aria-labelledby="h-try">
+    <span class="eyebrow">2 · Erori, felul B</span>
+    <h2 id="h-try">Erori care crapă aplicația: <code>try/catch</code></h2>
+    <p class="prose">Unele apeluri „aruncă” o excepție când primesc ceva greșit. Dacă nu o prinzi, aplicația se închide cu <em>„App keeps stopping”</em>. Le pui în <code>try/catch</code>.</p>
+
+    <div class="tbl">
+      <table>
+        <thead><tr><th>Apelul</th><th>Când crapă</th><th>Excepția</th></tr></thead>
+        <tbody>
+          <tr><td><code>Double.parseDouble</code>, <code>Integer.parseInt</code></td><td>textul nu e număr (gol, „abc”)</td><td><code>NumberFormatException</code></td></tr>
+          <tr><td><code>LocalDate.parse</code></td><td>data nu e de forma <code>AAAA-LL-ZZ</code></td><td><code>DateTimeParseException</code></td></tr>
+          <tr><td><code>Categorie.valueOf</code></td><td>textul nu e o valoare din enum</td><td><code>IllegalArgumentException</code></td></tr>
+          <tr><td>citirea unui fișier din <code>assets</code></td><td>fișierul nu există</td><td><code>IOException</code></td></tr>
+          <tr><td>parsarea de JSON / XML</td><td>textul e stricat sau lipsește o cheie</td><td><code>JSONException</code>, <code>Exception</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="io">
+      <div>
+        <span class="eyebrow">Forma</span>
+<pre><code data-lang="java">try {
+    // codul riscant
+} catch (Exception e) {
+    // ce faci dacă a crăpat
+}</code></pre>
+        <p class="prose"><code>catch (Exception e)</code> prinde orice. <code>e.getMessage()</code> îți dă textul erorii.</p>
+      </div>
+      <div>
+        <span class="eyebrow">În proiect: meniul de import (MainActivity)</span>
+<pre><code data-lang="java">try {
+    String text = citesteAsset("anunturi.json");
+    importa(ParserJson.dinText(text));
+} catch (Exception e) {
+    Toast.makeText(this, "Eroare la import: "
+            + e.getMessage(), Toast.LENGTH_LONG).show();
+}</code></pre>
+      </div>
+    </div>
+
+    <div class="block">
+      <span class="eyebrow">Cele două feluri, împreună (FormularValidator)</span>
+      <p class="prose">Validatorul folosește <code>try/catch</code> ca să transforme o excepție într-un mesaj de eroare pentru câmp, în loc să lase aplicația să crape:</p>
+<pre><code data-lang="java">try {
+    double pret = Double.parseDouble(pretText.trim());
+    if (pret &lt;= 0) {
+        erori.put("pret", "Pretul trebuie sa fie mai mare ca 0");
+    }
+} catch (NullPointerException | NumberFormatException e) {
+    erori.put("pret", "Pretul trebuie sa fie un numar (ex. 10.5)");
+}</code></pre>
+    </div>
+
+    <div class="callout">
+      <strong>Bonus: erori doar pentru tine</strong>
+      <p><code>Log.e("DAM", "ceva n-a mers", e);</code> scrie eroarea în <strong>Logcat</strong>, tab-ul de jos din Android Studio. Utilizatorul nu vede nimic; tu vezi tot mesajul și linia unde a crăpat. Tot în Logcat vezi și de ce s-a închis aplicația când n-ai pus <code>try/catch</code>.</p>
+    </div>
+  </section>
+
+  <!-- LAYOUT -->
+  <section id="layout" aria-labelledby="h-layout">
+    <span class="eyebrow">3 · Cum arată ecranul</span>
+    <h2 id="h-layout">Layout-uri</h2>
+    <p class="prose">Un layout e un fișier XML din <code>res/layout/</code> care spune <strong>cum arată</strong> ecranul. Codul Java spune <strong>ce face</strong> ecranul.</p>
+
+    <div class="block">
+      <span class="eyebrow">Legătura cu activitatea</span>
+      <div class="flow" role="img" aria-label="activity_add.xml generează automat ActivityAddBinding, pe care AddActivity îl folosește în onCreate">
+        <div class="node"><code>activity_add.xml</code><span>îl scrii tu</span></div>
+        <div class="arrow" aria-hidden="true">→</div>
+        <div class="node"><code>ActivityAddBinding</code><span>generat automat, cu un câmp pentru fiecare id</span></div>
+        <div class="arrow" aria-hidden="true">→</div>
+        <div class="node"><code>AddActivity.onCreate</code><span>îl încarcă și îl pune pe ecran</span></div>
+      </div>
+<pre><code data-lang="java">binding = ActivityAddBinding.inflate(getLayoutInflater());
+setContentView(binding.getRoot());</code></pre>
+      <p class="prose">Numele fișierului are <strong>doar litere mici, cifre și <code>_</code></strong>: <code>activity_add.xml</code> merge, <code>ActivityAdd.xml</code> nu.</p>
+    </div>
+
+    <div class="block">
+      <span class="eyebrow">Cum arată un layout: un container cu componente în el</span>
+<pre><code data-lang="xml">&lt;LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"&gt;
+
+    &lt;EditText
+        android:id="@+id/etTitlu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Titlu"
+        android:inputType="text" /&gt;
+
+    &lt;Button
+        android:id="@+id/btnSalveaza"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Salvează" /&gt;
+&lt;/LinearLayout&gt;</code></pre>
+    </div>
+
+    <div class="block">
+      <span class="eyebrow">Atributele care contează</span>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Atribut</th><th>Ce face</th></tr></thead>
+          <tbody>
+            <tr><td><code>layout_width</code>, <code>layout_height</code></td><td><strong>obligatorii</strong> la orice element. <code>match_parent</code> = cât părintele, <code>wrap_content</code> = cât conținutul, sau o valoare fixă ca <code>100dp</code></td></tr>
+            <tr><td><code>android:id="@+id/etTitlu"</code></td><td>numele prin care ajungi la element din Java: <code>binding.etTitlu</code>. Fără id nu-l poți accesa</td></tr>
+            <tr><td><code>orientation</code></td><td><code>vertical</code> (unul sub altul) sau <code>horizontal</code> (unul lângă altul); doar la LinearLayout</td></tr>
+            <tr><td><code>text</code>, <code>hint</code></td><td>textul afișat / textul gri care apare când câmpul e gol</td></tr>
+            <tr><td><code>inputType</code></td><td>ce tastatură apare: <code>text</code>, <code>textMultiLine</code>, <code>number</code>, <code>numberDecimal</code>, <code>textEmailAddress</code>, <code>textPassword</code></td></tr>
+            <tr><td><code>padding</code>, <code>layout_margin</code>, <code>textSize</code></td><td>spațiu înăuntru / spațiu în afară, în <code>dp</code>; mărimea textului, în <code>sp</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="block">
+      <span class="eyebrow">Containere</span>
+      <ul class="prose">
+        <li><strong>LinearLayout</strong>: pune elementele unul sub altul (sau unul lângă altul). E cel mai simplu; <strong>pe ăsta îl folosești la examen</strong>.</li>
+        <li><strong>ScrollView</strong>: pentru ecranele care nu încap. Poate avea <strong>un singur copil</strong>, deci pui un LinearLayout în el, cum e în <code>activity_add.xml</code>.</li>
+        <li><strong>ConstraintLayout</strong>: îl pune wizard-ul implicit. E mai greu, pentru că fiecare element are nevoie de constrângeri ca să știe unde stă.</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <span class="eyebrow">Ce apelezi din Java pe fiecare componentă</span>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>În XML</th><th>În Java (prin binding)</th></tr></thead>
+          <tbody>
+            <tr><td><code>TextView</code></td><td><code>binding.tvCurs.setText("1 EUR = 4.97 RON");</code></td></tr>
+            <tr><td><code>EditText</code></td><td><code>getText().toString()</code>, <code>setText(…)</code>, <code>setError(…)</code></td></tr>
+            <tr><td><code>Button</code></td><td><code>binding.btnSalveaza.setOnClickListener(v -&gt; salveaza());</code></td></tr>
+            <tr><td><code>CheckBox</code></td><td><code>binding.chkNou.isChecked()</code></td></tr>
+            <tr><td><code>Spinner</code></td><td><code>setAdapter(…)</code>, <code>getSelectedItem()</code></td></tr>
+            <tr><td><code>ListView</code></td><td><code>binding.lvAnunturi.setAdapter(adapter);</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="io">
+      <div>
+        <span class="eyebrow">Cum creezi un layout</span>
+        <ul class="prose">
+          <li>Automat, odată cu activitatea (<strong>New → Activity → Empty Views Activity</strong>, cu <strong>Source Language: Java</strong>).</li>
+          <li>Manual: click dreapta pe <code>res/layout</code> → <strong>New → Layout Resource File</strong> → scrii numele (de exemplu <code>activity_muie</code>) → <strong>Root element</strong>: <code>LinearLayout</code> → <strong>OK</strong>.</li>
+        </ul>
+      </div>
+      <div>
+        <span class="eyebrow">Cum îl vezi</span>
+        <ul class="prose">
+          <li>Deschizi fișierul XML. Sus în dreapta ai butoanele <strong>Code</strong>, <strong>Split</strong>, <strong>Design</strong>.</li>
+          <li><strong>Split</strong> îți arată codul și desenul ecranului unul lângă altul. Mai multe în <a href="proba3.html#interfata">ghidul Proba 3</a>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="block">
+      <span class="eyebrow"><code>item_anunt.xml</code> e alt fel de layout</span>
+      <p class="prose">Nu e pentru tot ecranul, e pentru <strong>un singur rând din listă</strong>. Nu-l încarci cu <code>setContentView</code>; îl încarcă adapterul pentru fiecare rând, iar elementele le iei cu <code>findViewById</code>:</p>
+<pre><code data-lang="java">convertView = LayoutInflater.from(context).inflate(R.layout.item_anunt, parent, false);
+holder.tvTitlu = convertView.findViewById(R.id.tvTitlu);</code></pre>
+    </div>
+  </section>
+
+  <!-- CAPCANE -->
+  <section id="capcane" aria-labelledby="h-capcane">
+    <span class="eyebrow">Ce crapă cel mai des</span>
+    <h2 id="h-capcane">Capcane</h2>
+    <ul class="check">
+      <li>Am pus <code>.show()</code> la fiecare Toast.</li>
+      <li>Nu dau niciun <code>int</code> gol lui <code>Toast.makeText</code> sau lui <code>setText</code>: scriu <code>"" + n</code> sau <code>String.valueOf(n)</code>.</li>
+      <li>După <code>setError</code> am <code>return;</code> dacă există erori; altfel obiectul se creează cu date greșite și crapă la <code>parseDouble</code>.</li>
+      <li>Orice <code>parseDouble</code>, <code>parseInt</code>, <code>LocalDate.parse</code> sau citire de fișier e în <code>try/catch</code> (sau trece întâi prin validator).</li>
+      <li>Fiecare element din XML are <code>layout_width</code> și <code>layout_height</code>.</li>
+      <li>Id-ul din XML e scris la fel ca în Java. Dacă <code>binding.etX</code> rămâne roșu, dau <strong>Build → Rebuild Project</strong>.</li>
+      <li>ScrollView-ul are un singur copil direct.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <p>Model de antrenament, neoficial.</p>
+    <p><a href="proba3.html">← Ghidul Proba 3</a> · <a href="./">← Primul ghid (Proba 1)</a></p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  var javaRe = /(\/\/[^\n]*)|("(?:\\.|[^"\\\n])*")|('(?:\\.|[^'\\])')|\b(public|private|protected|static|final|class|return|if|else|for|while|new|try|catch|throws|throw|int|double|boolean|void|null|true|false|this|implements|extends|import|package|continue|super)\b|\b(\d+(?:\.\d+)?)\b|(@\w+)|\b([A-Z]\w*)\b/g;
+  var xmlRe = /(<!--[\s\S]*?-->)|(<\/?[\w.:]+|\/?>)|([\w:]+)(?==)|("[^"]*")/g;
+  function hl(src, re, cls) {
+    var out = '', last = 0, m;
+    re.lastIndex = 0;
+    while ((m = re.exec(src)) !== null) {
+      if (m[0] === '') { re.lastIndex++; continue; }
+      out += esc(src.slice(last, m.index));
+      var c = '';
+      for (var g = 1; g < m.length; g++) { if (m[g] !== undefined) { c = cls[g - 1]; break; } }
+      out += c ? '<span class="' + c + '">' + esc(m[0]) + '</span>' : esc(m[0]);
+      last = re.lastIndex;
+    }
+    return out + esc(src.slice(last));
+  }
+  var codes = document.querySelectorAll('pre code[data-lang]');
+  for (var i = 0; i < codes.length; i++) {
+    var el = codes[i], src = el.textContent;
+    el.innerHTML = el.getAttribute('data-lang') === 'xml'
+      ? hl(src, xmlRe, ['c', 'k', 'a', 's'])
+      : hl(src, javaRe, ['c', 's', 's', 'k', 'n', 'a', 't']);
+  }
+})();
+</script>
+</body>
+</html>

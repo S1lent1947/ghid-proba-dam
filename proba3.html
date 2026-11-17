@@ -61,6 +61,7 @@
   .lead { font-size: 18px; color: var(--muted); max-width: 65ch; }
   .prose { max-width: 68ch; display: grid; gap: 12px; }
   .prose ul, .prose ol { margin: 0; padding-left: 22px; display: grid; gap: 6px; }
+  p.prose { display: block; }
 
   header { display: grid; gap: 18px; }
   .back { font-size: 14px; }
@@ -137,6 +138,7 @@
       <a href="#interfata">Cum vezi interfața</a>
       <a href="#teste">Cum rulezi testele</a>
       <a href="#checklist">Checklist</a>
+      <a href="toast-erori-layout.html">Toast, erori și layout-uri, pe larg →</a>
     </nav>
   </header>
 
@@ -698,7 +700,7 @@ private SharedPreferences getPrefs() {
   <section id="toast" aria-labelledby="h-toast">
     <span class="eyebrow">Android</span>
     <h2 id="h-toast">Cum faci un Toast</h2>
-    <p class="prose">Toast-ul e mesajul mic care apare jos pe ecran câteva secunde și dispare singur.</p>
+    <p class="prose">Toast-ul e mesajul mic care apare jos pe ecran câteva secunde și dispare singur. Explicat pe larg, împreună cu erorile și layout-urile: <a href="toast-erori-layout.html">Toast, erori și layout-uri →</a></p>
     <ol class="steps">
       <li>Sus în fișier ai nevoie de <code>import android.widget.Toast;</code>. Dacă scrii <code>Toast</code> și se face roșu, apeși <kbd>Alt</kbd>+<kbd>Enter</kbd> și ți-l adaugă singur.</li>
       <li>Scrii linia acolo unde vrei să apară mesajul:</li>

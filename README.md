@@ -15,3 +15,9 @@ Ghiduri pentru modelele de practică la proba practică DAM.
 - cum faci un Toast;
 - cum vezi interfața unei activități (editorul de layout și emulatorul);
 - cum rulezi testele și checklist pentru examen.
+
+**Toast, erori și layout-uri**: https://s1lent1947.github.io/ghid-proba-dam/toast-erori-layout.html
+
+- Toast: din ce bucăți e făcut, unde îl apelezi, ce pui la context;
+- erori pe câmpuri cu `setError` și erori care crapă aplicația cu `try/catch`;
+- layout-uri: legătura cu binding-ul, atribute, containere, ce apelezi din Java pe fiecare componentă.
