@@ -1,0 +1,875 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Harta proiectului Proba1Model: cele 5 fișiere cu rezolvarea, de ce stă fiecare acolo, codul explicat pas cu pas și checklist pentru examen.">
+<style>html{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+<title>Ghid Proba 1 DAM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+  /* Layout: o singură coloană de lectură (max 880px); harta proiectului ca panou tip IDE; secțiuni una sub alta */
+  :root {
+    --bg: #F4F6F2;
+    --surface: #FFFFFF;
+    --fg: #1B2220;
+    --muted: #59645F;
+    --line: #D9DFDA;
+    --accent: #0E6B5A;
+    --accent-soft: #DFEFE9;
+    --mark: #FFE36E;
+    --mark-fg: #362B00;
+    --test: #5646C2;
+    --test-soft: #EBE8FB;
+    --code-bg: #EDF1EC;
+    --ok: #1C7A3E;
+    --bad: #B3261E;
+    --k: #8A3FB0; --s: #1F7A3A; --c: #76827D; --n: #B5521B; --t: #0E5C8C; --a: #8E6400;
+    --font-display: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+    --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, Consolas, "Courier New", monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #111614; --surface: #181E1C; --fg: #E2E8E4; --muted: #9AA7A2; --line: #2A3330;
+      --accent: #4CC2A6; --accent-soft: #15302A; --mark: #4B4013; --mark-fg: #FFE58A;
+      --test: #ADA1FF; --test-soft: #241F45; --code-bg: #0D1211; --ok: #6FD08F; --bad: #FF8A80;
+      --k: #D59DF2; --s: #8DD79C; --c: #72807B; --n: #F0A272; --t: #7CC1F0; --a: #E3B95A;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #111614; --surface: #181E1C; --fg: #E2E8E4; --muted: #9AA7A2; --line: #2A3330;
+    --accent: #4CC2A6; --accent-soft: #15302A; --mark: #4B4013; --mark-fg: #FFE58A;
+    --test: #ADA1FF; --test-soft: #241F45; --code-bg: #0D1211; --ok: #6FD08F; --bad: #FF8A80;
+    --k: #D59DF2; --s: #8DD79C; --c: #72807B; --n: #F0A272; --t: #7CC1F0; --a: #E3B95A;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 40px 72px;
+    display: grid;
+    gap: 56px;
+  }
+  h1, h2, h3 { font-family: var(--font-display); line-height: 1.2; text-wrap: balance; margin: 0; }
+  h1 { font-size: clamp(30px, 5vw, 42px); font-weight: 700; letter-spacing: -0.01em; }
+  h2 { font-size: 26px; font-weight: 700; }
+  h3 { font-size: 19px; font-weight: 700; }
+  p { margin: 0; }
+  a { color: var(--accent); text-underline-offset: 3px; }
+  a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  code, kbd, .mono { font-family: var(--font-mono); font-size: 0.88em; }
+  :not(pre) > code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+  kbd {
+    display: inline-block; padding: 1px 7px; border: 1px solid var(--line); border-bottom-width: 2px;
+    border-radius: 5px; background: var(--surface); white-space: nowrap;
+  }
+  .eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  section { display: grid; gap: 20px; min-width: 0; }
+  .lead { font-size: 18px; color: var(--muted); max-width: 65ch; }
+  .prose { max-width: 68ch; display: grid; gap: 12px; }
+
+  /* Header */
+  header { display: grid; gap: 18px; }
+  .funnel { display: flex; flex-wrap: wrap; align-items: stretch; gap: 10px; margin-top: 6px; }
+  .funnel .step {
+    flex: 1 1 180px; min-width: 0; padding: 14px 16px; border: 1px solid var(--line);
+    border-radius: 10px; background: var(--surface); display: grid; gap: 2px;
+  }
+  .funnel .num { font-family: var(--font-display); font-size: 34px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .funnel .lbl { font-size: 14px; color: var(--muted); }
+  .funnel .step.hot { background: var(--mark); border-color: transparent; }
+  .funnel .step.hot .num, .funnel .step.hot .lbl { color: var(--mark-fg); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; }
+  nav.toc a { text-decoration: none; }
+  nav.toc a:hover { text-decoration: underline; }
+
+  /* Legend + toggle */
+  .toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 14px; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+  .sw.w { background: var(--mark); outline: 1px solid color-mix(in srgb, var(--mark-fg) 25%, transparent); }
+  .sw.t { background: var(--test); }
+  .sw.r { background: var(--accent); }
+  .sw.i { background: var(--line); }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--surface); }
+  .seg button {
+    font: inherit; font-size: 14px; padding: 6px 12px; border: 0; background: transparent; color: var(--muted); cursor: pointer;
+  }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); }
+
+  /* File tree */
+  .treebox {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    padding: 14px 10px; overflow-x: auto; font-family: var(--font-mono); font-size: 13.5px; line-height: 1.5;
+  }
+  .tree, .tree ul { list-style: none; margin: 0; padding: 0; }
+  .tree ul { margin-left: 13px; padding-left: 12px; border-left: 1px dashed var(--line); }
+  .tree li { margin: 1px 0; }
+  .row {
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px;
+    padding: 3px 8px; border-radius: 6px;
+  }
+  summary.row { cursor: pointer; list-style: none; }
+  summary.row::-webkit-details-marker { display: none; }
+  summary.row::before {
+    content: ""; width: 0; height: 0; align-self: center;
+    border-left: 5px solid var(--muted); border-top: 4px solid transparent; border-bottom: 4px solid transparent;
+    transition: transform .15s; margin-right: -2px;
+  }
+  details[open] > summary.row::before { transform: rotate(90deg); }
+  .nm { white-space: nowrap; }
+  .dir > details > summary .nm { font-weight: 600; }
+  .tag {
+    font-family: var(--font-body); font-size: 11.5px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+    padding: 0 7px; border-radius: 999px; white-space: nowrap;
+  }
+  .note { font-family: var(--font-body); font-size: 13px; color: var(--muted); }
+  li.w > .row, li.w > a.row { background: var(--mark); color: var(--mark-fg); text-decoration: none; }
+  li.w > .row .note, li.w > a.row .note { color: var(--mark-fg); opacity: .8; }
+  li.w .tag { background: var(--mark-fg); color: var(--mark); }
+  li.w > a.row:hover .nm { text-decoration: underline; }
+  li.t > .row .nm { color: var(--test); font-weight: 600; }
+  li.t .tag { background: var(--test-soft); color: var(--test); }
+  li.r > .row .nm { color: var(--accent); font-weight: 600; }
+  li.r .tag { background: var(--accent-soft); color: var(--accent); }
+  li.i > .row .nm, li.i > details > summary .nm { color: var(--muted); }
+  li.i .tag { background: var(--code-bg); color: var(--muted); }
+  .treebox.focus li.i { display: none; }
+
+  /* Clues */
+  .clues { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+  .clue { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+  .clue .eyebrow { color: var(--accent); }
+  .pkgmap { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 8px; overflow-x: auto; }
+  .pkgmap code { background: none; padding: 0; font-size: 14px; white-space: nowrap; }
+  .pkgmap b { color: var(--surface); background: var(--accent); border-radius: 3px; padding: 0 2px; font-weight: 600; }
+  .pkgmap .arrow { font-size: 13px; color: var(--muted); }
+
+  /* Requirement cards */
+  .req { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; scroll-margin-top: 16px; }
+  .req-head { padding: 18px 20px 14px; display: grid; gap: 8px; border-bottom: 1px solid var(--line); }
+  .req-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+  .pts { font-family: var(--font-mono); font-size: 12px; padding: 1px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  .path {
+    font-family: var(--font-mono); font-size: 13px; background: var(--mark); color: var(--mark-fg);
+    padding: 4px 10px; border-radius: 6px; overflow-wrap: anywhere; justify-self: start; max-width: 100%;
+  }
+  .req-body { padding: 18px 20px 20px; display: grid; gap: 18px; }
+  .block { display: grid; gap: 8px; min-width: 0; }
+  .block > .eyebrow { color: var(--fg); font-weight: 600; }
+  .block ul, .block ol { margin: 0; padding-left: 22px; display: grid; gap: 6px; }
+  .traps { border-left: 3px solid var(--bad); padding: 10px 14px; background: color-mix(in srgb, var(--bad) 7%, var(--surface)); border-radius: 0 8px 8px 0; }
+  .traps .eyebrow { color: var(--bad); }
+
+  pre {
+    margin: 0; background: var(--code-bg); border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 16px; overflow-x: auto; font-family: var(--font-mono); font-size: 13px; line-height: 1.55; tab-size: 4;
+  }
+  pre code { font-size: inherit; }
+  .k { color: var(--k); font-weight: 600; } .s { color: var(--s); } .c { color: var(--c); font-style: italic; }
+  .n { color: var(--n); } .t { color: var(--t); } .a { color: var(--a); }
+
+  .io { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
+  .io > div { min-width: 0; display: grid; gap: 6px; }
+  .io .eyebrow { font-size: 11px; }
+
+  .tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  th { font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); background: var(--code-bg); }
+  td code { white-space: nowrap; }
+  .yes { color: var(--ok); font-weight: 600; } .no { color: var(--bad); font-weight: 600; }
+
+  .steps { margin: 0; padding-left: 24px; display: grid; gap: 10px; max-width: 68ch; }
+  .steps li::marker { font-family: var(--font-display); font-weight: 700; color: var(--accent); }
+  .callout { background: var(--accent-soft); border-radius: 12px; padding: 16px 18px; display: grid; gap: 8px; }
+  .callout.warn { background: color-mix(in srgb, var(--mark) 55%, var(--surface)); }
+  .callout.warn, .callout.warn * { color: var(--fg); }
+  .result {
+    font-family: var(--font-mono); font-size: 13px; background: var(--code-bg); border: 1px solid var(--line);
+    border-radius: 10px; padding: 14px 16px; overflow-x: auto; white-space: pre; line-height: 1.5;
+  }
+  .result .ok { color: var(--ok); font-weight: 600; }
+  footer { font-size: 14px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 18px; }
+
+  @media (prefers-reduced-motion: reduce) { summary.row::before { transition: none; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <span class="eyebrow">Proba practică 1 · model de practică · proiectul Proba1Model</span>
+    <h1>Unde e codul în proiect și de ce acolo</h1>
+    <p class="lead">Android Studio îți arată sute de fișiere, dar majoritatea sunt generate automat sau sunt configurare. Ghidul ăsta îți arată cele 5 fișiere în care ai scris rezolvarea, de ce stă fiecare acolo și cum le găsești singur la proba reală.</p>
+    <div class="funnel" aria-label="Câte fișiere contează">
+      <div class="step"><span class="num">567</span><span class="lbl">fișiere în tot folderul proiectului</span></div>
+      <div class="step"><span class="num">52</span><span class="lbl">de cod, teste, resurse și configurare (celelalte 515 sunt generate automat)</span></div>
+      <div class="step hot"><span class="num">5</span><span class="lbl">în care scrii tu rezolvarea, câte unul pentru fiecare cerință</span></div>
+    </div>
+    <nav class="toc" aria-label="Cuprins">
+      <a href="#harta">Harta proiectului</a>
+      <a href="#regula">Cum știi unde pui codul</a>
+      <a href="#c1">Cerința 1</a>
+      <a href="#c2">Cerința 2</a>
+      <a href="#c3">Cerința 3</a>
+      <a href="#c4">Cerința 4</a>
+      <a href="#c5">Cerința 5</a>
+      <a href="#studio">Navigare în Android Studio</a>
+      <a href="#teste">Teste și predare</a>
+      <a href="#checklist">Checklist pentru examen</a>
+    </nav>
+  </header>
+
+  <!-- HARTA -->
+  <section id="harta" aria-labelledby="h-harta">
+    <span class="eyebrow">Harta</span>
+    <h2 id="h-harta">Harta proiectului</h2>
+    <p class="prose">Așa arată folderul <code>model-practica-dam</code> pe disc (vederea <em>Project</em> din Android Studio). Fișierele marcate cu galben sunt cele în care e rezolvarea. Apasă pe ele ca să sari la explicație. Cu butonul „Doar ce contează” ascunzi tot restul.</p>
+
+    <div class="toolbar">
+      <div class="legend">
+        <span><i class="sw w"></i>Scrii aici (5)</span>
+        <span><i class="sw t"></i>Testele care te verifică</span>
+        <span><i class="sw r"></i>Citești</span>
+        <span><i class="sw i"></i>Ignori</span>
+      </div>
+      <div class="seg" role="group" aria-label="Ce afișează harta">
+        <button type="button" id="btn-all" aria-pressed="true">Tot proiectul</button>
+        <button type="button" id="btn-focus" aria-pressed="false">Doar ce contează</button>
+      </div>
+    </div>
+
+    <div class="treebox" id="tree">
+      <ul class="tree">
+        <li class="dir"><details open><summary class="row"><span class="nm">model-practica-dam/</span><span class="note">folderul proiectului, de pe Desktop</span></summary>
+          <ul>
+            <li class="i"><span class="row"><span class="nm">.gradle/</span><span class="tag">generat</span><span class="note">cache-ul Gradle</span></span></li>
+            <li class="i"><span class="row"><span class="nm">.idea/</span><span class="tag">generat</span><span class="note">setările Android Studio pentru proiect</span></span></li>
+            <li class="dir"><details open><summary class="row"><span class="nm">app/</span><span class="note">modulul aplicației: aici e tot ce contează</span></summary>
+              <ul>
+                <li class="i"><span class="row"><span class="nm">build/</span><span class="tag">generat</span><span class="note">sute de fișiere compilate, se refac la fiecare build</span></span></li>
+                <li class="dir"><details open><summary class="row"><span class="nm">src/</span><span class="note">codul sursă</span></summary>
+                  <ul>
+                    <li class="dir"><details open><summary class="row"><span class="nm">main/</span><span class="note">codul aplicației: <strong>doar asta se predă pe Moodle</strong></span></summary>
+                      <ul>
+                        <li class="dir"><details open><summary class="row"><span class="nm">java/ro/ase/dam/examen/</span><span class="note">pachetul <code>ro.ase.dam.examen</code></span></summary>
+                          <ul>
+                            <li class="dir"><details open><summary class="row"><span class="nm">domeniu/</span><span class="note">modelul de date și regulile despre el</span></summary>
+                              <ul>
+                                <li class="w"><a class="row" href="#c1"><span class="nm">Produs.java</span><span class="tag">C1 · Model</span><span class="note">clasa produsului</span></a></li>
+                                <li class="w"><a class="row" href="#c2"><span class="nm">Validator.java</span><span class="tag">C2 · Validare</span><span class="note">când e un produs valid</span></a></li>
+                                <li class="w"><a class="row" href="#c5"><span class="nm">ProduseService.java</span><span class="tag">C5 · Filtrare</span><span class="note">operații pe liste de produse</span></a></li>
+                              </ul>
+                            </details></li>
+                            <li class="dir"><details open><summary class="row"><span class="nm">json/</span><span class="note">tot ce ține de formatul JSON</span></summary>
+                              <ul>
+                                <li class="w"><a class="row" href="#c3"><span class="nm">ParserJson.java</span><span class="tag">C3 · JSON</span><span class="note">text JSON → listă de produse</span></a></li>
+                              </ul>
+                            </details></li>
+                            <li class="dir"><details open><summary class="row"><span class="nm">xml/</span><span class="note">tot ce ține de formatul XML</span></summary>
+                              <ul>
+                                <li class="w"><a class="row" href="#c4"><span class="nm">ParserXml.java</span><span class="tag">C4 · XML</span><span class="note">text XML → listă de produse</span></a></li>
+                              </ul>
+                            </details></li>
+                            <li class="i"><span class="row"><span class="nm">MainActivity.java</span><span class="tag">nu se cere</span><span class="note">ecranul aplicației, neatins la proba asta</span></span></li>
+                          </ul>
+                        </details></li>
+                        <li class="dir i"><details><summary class="row"><span class="nm">res/</span><span class="tag">resurse</span><span class="note">21 de fișiere: layout, texte, culori, iconițe</span></summary>
+                          <ul>
+                            <li class="i"><span class="row"><span class="nm">layout/activity_main.xml</span><span class="note">cum arată ecranul</span></span></li>
+                            <li class="i"><span class="row"><span class="nm">values/, values-night/</span><span class="note">texte, culori, teme</span></span></li>
+                            <li class="i"><span class="row"><span class="nm">drawable/, mipmap-*/</span><span class="note">iconița aplicației, în mai multe rezoluții</span></span></li>
+                            <li class="i"><span class="row"><span class="nm">xml/</span><span class="note">reguli de backup</span></span></li>
+                          </ul>
+                        </details></li>
+                        <li class="i"><span class="row"><span class="nm">AndroidManifest.xml</span><span class="tag">config</span><span class="note">descrierea aplicației pentru Android</span></span></li>
+                      </ul>
+                    </details></li>
+                    <li class="dir"><details open><summary class="row"><span class="nm">test/</span><span class="note">testele profesorului: le citești, nu le modifici</span></summary>
+                      <ul>
+                        <li class="dir"><details open><summary class="row"><span class="nm">java/ro/ase/dam/examen/</span></summary>
+                          <ul>
+                            <li class="i dir"><details><summary class="row"><span class="nm">grading/</span><span class="tag">nu atingi</span><span class="note">6 fișiere care calculează punctajul</span></summary>
+                              <ul><li class="i"><span class="row"><span class="nm">GradedTest.java, Punctaj.java, …</span></span></li></ul>
+                            </details></li>
+                            <li class="t"><span class="row"><span class="nm">R0_ModelTest.java</span><span class="tag">verifică C1</span></span></li>
+                            <li class="t"><span class="row"><span class="nm">R2_ValidatorTest.java</span><span class="tag">verifică C2</span></span></li>
+                            <li class="t"><span class="row"><span class="nm">R3_ParserJsonTest.java</span><span class="tag">verifică C3</span></span></li>
+                            <li class="t"><span class="row"><span class="nm">R3_ParserXmlTest.java</span><span class="tag">verifică C4</span></span></li>
+                            <li class="t"><span class="row"><span class="nm">R4_ServiceTest.java</span><span class="tag">verifică C5</span></span></li>
+                          </ul>
+                        </details></li>
+                      </ul>
+                    </details></li>
+                  </ul>
+                </details></li>
+                <li class="i"><span class="row"><span class="nm">build.gradle.kts</span><span class="tag">config</span><span class="note">bibliotecile modulului și task-ul zipPentruMoodle</span></span></li>
+              </ul>
+            </details></li>
+            <li class="i"><span class="row"><span class="nm">build/</span><span class="tag">generat</span><span class="note">rapoarte Gradle</span></span></li>
+            <li class="i"><span class="row"><span class="nm">gradle/</span><span class="tag">config</span><span class="note">versiunea Gradle și versiunile bibliotecilor</span></span></li>
+            <li class="r"><span class="row"><span class="nm">ENUNT.md</span><span class="tag">citești</span><span class="note">cerințele și punctajul</span></span></li>
+            <li class="i"><span class="row"><span class="nm">build.gradle.kts, settings.gradle.kts</span><span class="tag">config</span><span class="note">configurarea Gradle pentru tot proiectul</span></span></li>
+            <li class="i"><span class="row"><span class="nm">gradle.properties, local.properties</span><span class="tag">config</span><span class="note">memorie pentru Gradle, calea către SDK</span></span></li>
+            <li class="i"><span class="row"><span class="nm">gradlew, gradlew.bat</span><span class="tag">config</span><span class="note">pornesc Gradle din terminal</span></span></li>
+          </ul>
+        </details></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- REGULA -->
+  <section id="regula" aria-labelledby="h-regula">
+    <span class="eyebrow">Regula</span>
+    <h2 id="h-regula">Cum știi unde pui codul</h2>
+    <p class="prose">N-am ales eu locurile. Proiectul ți le spune singur, prin trei indicii. Dacă le urmărești, la proba reală găsești fișierele fără să cauți prin toate folderele.</p>
+
+    <div class="clues">
+      <div class="clue">
+        <span class="eyebrow">Indiciul 1</span>
+        <h3>Comentariul <code>// TODO</code></h3>
+        <p>Profesorul a pregătit deja fiecare fișier și fiecare metodă. Acolo unde scrie <code>// TODO</code> trebuie să completezi tu. Nu creezi fișiere noi. În Android Studio le vezi pe toate în fereastra <strong>TODO</strong> (<em>View → Tool Windows → TODO</em>).</p>
+      </div>
+      <div class="clue">
+        <span class="eyebrow">Indiciul 2</span>
+        <h3>Importul din test</h3>
+        <p>Fiecare test spune exact unde caută clasa. De exemplu, <code>R2_ValidatorTest</code> începe cu:</p>
+        <pre><code class="java">import ro.ase.dam.examen.domeniu.Validator;</code></pre>
+        <p>Dacă muți sau redenumești clasa, testul nu mai compilează și pierzi <strong>toate</strong> punctele.</p>
+      </div>
+      <div class="clue">
+        <span class="eyebrow">Indiciul 3</span>
+        <h3>Doar în <code>src/main</code></h3>
+        <p>Task-ul <code>zipPentruMoodle</code> arhivează numai <code>app/src/main</code>. Orice ai scrie în <code>src/test</code> sau în altă parte nu ajunge la profesor.</p>
+      </div>
+    </div>
+
+    <div class="pkgmap" aria-label="Pachetul devine folder">
+      <code><span class="k" style="color:var(--k)">package</span> ro<b>.</b>ase<b>.</b>dam<b>.</b>examen<b>.</b>domeniu;</code>
+      <span class="arrow">↓ în Java, punctele din numele pachetului devin foldere pe disc</span>
+      <code>app/src/main/java/ro<b>/</b>ase<b>/</b>dam<b>/</b>examen<b>/</b>domeniu/Produs.java</code>
+    </div>
+
+    <div class="prose">
+      <h3>De ce sunt împărțite în <code>domeniu</code>, <code>json</code> și <code>xml</code></h3>
+      <p>Fiecare pachet are o singură treabă, ca să nu ai tot codul amestecat într-un fișier uriaș:</p>
+      <ul style="margin:0;padding-left:22px;display:grid;gap:6px">
+        <li><strong><code>domeniu</code></strong> conține ce <em>este</em> un produs (<code>Produs</code>) și regulile despre produse (<code>Validator</code>, <code>ProduseService</code>). Nu știe nimic despre JSON sau XML.</li>
+        <li><strong><code>json</code></strong> și <strong><code>xml</code></strong> conțin cum <em>citești</em> produsele dintr-un anumit format. Dacă se schimbă formatul, modifici doar parserul, nu și <code>Produs</code>.</li>
+        <li><strong>De ce nu în <code>MainActivity</code>?</strong> <code>MainActivity</code> e ecranul și are nevoie de telefon sau emulator. Testele rulează pe calculator, fără telefon, deci logica trebuie să stea în clase Java simple, care se pot testa separat.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- CERINTE -->
+  <section aria-labelledby="h-cerinte">
+    <span class="eyebrow">Rezolvarea</span>
+    <h2 id="h-cerinte">Cele 5 cerințe, una câte una</h2>
+
+    <!-- C1 -->
+    <article class="req" id="c1">
+      <div class="req-head">
+        <div class="req-meta"><span class="eyebrow">Cerința 1</span><span class="pts">2p</span></div>
+        <h3>Modelul: clasa Produs</h3>
+        <span class="path">app/src/main/java/ro/ase/dam/examen/domeniu/Produs.java</span>
+      </div>
+      <div class="req-body">
+        <div class="block">
+          <span class="eyebrow">De ce aici</span>
+          <ul>
+            <li>Testul <code>R0_ModelTest</code> o importă din <code>ro.ase.dam.examen.domeniu</code>.</li>
+            <li><code>Produs</code> e „lucrul” cu care lucrează toată aplicația, deci stă în <code>domeniu</code>.</li>
+            <li>O rezolvi <strong>prima</strong>: toate celelalte cerințe creează sau citesc obiecte <code>Produs</code>.</li>
+          </ul>
+        </div>
+        <div class="block">
+          <span class="eyebrow">Ce am scris, pas cu pas</span>
+          <ol>
+            <li>Trei câmpuri <code>private</code>: <code>denumire</code>, <code>pret</code>, <code>stoc</code>. Sunt private ca să nu le poată modifica nimeni direct (încapsulare).</li>
+            <li>Constructorul copiază parametrii în câmpuri. <code>this.</code> e necesar pentru că parametrul are același nume ca și câmpul.</li>
+            <li>Getteri, care citesc, și setteri, care modifică, pentru fiecare câmp.</li>
+            <li><code>toString()</code> întoarce un text cu toate valorile, de forma <code>Produs{denumire='Paine', pret=5.0, stoc=10}</code>.</li>
+          </ol>
+        </div>
+<pre><code class="java">public class Produs {
+
+    private String denumire;
+    private double pret;
+    private int stoc;
+
+    public Produs(String denumire, double pret, int stoc) {
+        this.denumire = denumire;
+        this.pret = pret;
+        this.stoc = stoc;
+    }
+
+    public String getDenumire() {
+        return denumire;
+    }
+
+    public void setDenumire(String denumire) {
+        this.denumire = denumire;
+    }
+
+    // ... la fel getPret/setPret si getStoc/setStoc
+
+    @Override
+    public String toString() {
+        return "Produs{" +
+                "denumire='" + denumire + '\'' +
+                ", pret=" + pret +
+                ", stoc=" + stoc +
+                '}';
+    }
+}</code></pre>
+        <div class="traps">
+          <span class="eyebrow">Capcane</span>
+          <ul>
+            <li>Testul caută câmpurile <strong>după nume</strong>, prin reflection. Trebuie să se numească exact <code>denumire</code>, <code>pret</code> și <code>stoc</code> și să fie <code>private</code>.</li>
+            <li>Testul creează două produse diferite. Dacă salvezi valorile în câmpuri <code>static</code>, al doilea produs îl suprascrie pe primul.</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <!-- C2 -->
+    <article class="req" id="c2">
+      <div class="req-head">
+        <div class="req-meta"><span class="eyebrow">Cerința 2</span><span class="pts">2p</span></div>
+        <h3>Validarea: când e un produs valid</h3>
+        <span class="path">app/src/main/java/ro/ase/dam/examen/domeniu/Validator.java</span>
+      </div>
+      <div class="req-body">
+        <div class="block">
+          <span class="eyebrow">De ce aici</span>
+          <ul>
+            <li>Testul <code>R2_ValidatorTest</code> o importă din <code>ro.ase.dam.examen.domeniu.Validator</code> și apelează <code>Validator.esteValid(p)</code>.</li>
+            <li>Validarea e o regulă despre produs, nu despre JSON sau XML. De aceea stă în <code>domeniu</code>, lângă <code>Produs</code>.</li>
+            <li>E o clasă separată, nu o metodă în <code>Produs</code>: o clasă se ocupă de un singur lucru. Clasa e <code>final</code>, are constructorul <code>private</code> și metoda <code>static</code>. Asta înseamnă că nu creezi obiecte <code>Validator</code>, ci apelezi direct <code>Validator.esteValid(...)</code>.</li>
+            <li>Parserele nu folosesc <code>Validator</code>. Enunțul le cere doar să sară peste denumirile goale, iar validarea completă e o cerință separată, testată separat.</li>
+          </ul>
+        </div>
+        <div class="block">
+          <span class="eyebrow">Ce am scris, pas cu pas (ordinea contează)</span>
+          <ol>
+            <li><strong>Întâi <code>p == null</code>.</strong> Dacă ai apela <code>p.getDenumire()</code> pe un <code>null</code>, programul ar crăpa cu <code>NullPointerException</code>.</li>
+            <li><strong>Denumirea:</strong> e invalidă dacă e <code>null</code> sau goală. <code>trim()</code> taie spațiile de la capete, deci și <code>"   "</code> e considerată goală.</li>
+            <li><strong>Prețul:</strong> trebuie să fie „strict pozitiv”, deci <code>pret &lt;= 0</code> e invalid. 0 nu e permis.</li>
+            <li><strong>Stocul:</strong> „nu poate fi negativ”, deci <code>stoc &gt;= 0</code> e valid. 0 e permis.</li>
+          </ol>
+        </div>
+<pre><code class="java">public static boolean esteValid(Produs p) {
+    // un produs null nu e valid
+    if (p == null) {
+        return false;
+    }
+    // denumirea nu poate fi null sau goala (nici doar spatii)
+    if (p.getDenumire() == null || p.getDenumire().trim().isEmpty()) {
+        return false;
+    }
+    // pretul trebuie sa fie strict pozitiv
+    if (p.getPret() &lt;= 0) {
+        return false;
+    }
+    // stocul nu poate fi negativ (0 e permis)
+    return p.getStoc() &gt;= 0;
+}</code></pre>
+        <div class="block">
+          <span class="eyebrow">Ce verifică testul</span>
+          <div class="tbl">
+            <table>
+              <thead><tr><th>Produsul</th><th>Rezultat</th><th>De ce</th></tr></thead>
+              <tbody>
+                <tr><td><code>("Paine", 5.0, 2)</code></td><td class="yes">valid</td><td>totul e în regulă</td></tr>
+                <tr><td><code>("X", 1.0, 0)</code></td><td class="yes">valid</td><td>stocul 0 e permis</td></tr>
+                <tr><td><code>null</code></td><td class="no">invalid</td><td>nu există produs</td></tr>
+                <tr><td><code>(null, 5.0, 1)</code></td><td class="no">invalid</td><td>denumirea e null</td></tr>
+                <tr><td><code>("", 5.0, 1)</code></td><td class="no">invalid</td><td>denumirea e goală</td></tr>
+                <tr><td><code>("X", 0, 1)</code></td><td class="no">invalid</td><td>prețul 0 nu e strict pozitiv</td></tr>
+                <tr><td><code>("X", -1, 1)</code></td><td class="no">invalid</td><td>prețul e negativ</td></tr>
+                <tr><td><code>("X", 5.0, -1)</code></td><td class="no">invalid</td><td>stocul e negativ</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="traps">
+          <span class="eyebrow">Capcane</span>
+          <ul>
+            <li>„Strict pozitiv” înseamnă <code>&gt; 0</code>, iar „nu poate fi negativ” înseamnă <code>&gt;= 0</code>. Citește cu atenție fiecare cuvânt din enunț.</li>
+            <li>Nu folosi <code>isBlank()</code>. Pe Android merge doar de la API 33, iar proiectul are <code>minSdk = 24</code>. <code>trim().isEmpty()</code> face același lucru și merge peste tot.</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <!-- C3 -->
+    <article class="req" id="c3">
+      <div class="req-head">
+        <div class="req-meta"><span class="eyebrow">Cerința 3</span><span class="pts">2p</span></div>
+        <h3>Importul JSON</h3>
+        <span class="path">app/src/main/java/ro/ase/dam/examen/json/ParserJson.java</span>
+      </div>
+      <div class="req-body">
+        <div class="block">
+          <span class="eyebrow">De ce aici</span>
+          <ul>
+            <li>Testul <code>R3_ParserJsonTest</code> o importă din <code>ro.ase.dam.examen.json.ParserJson</code>.</li>
+            <li>Pachetul <code>json</code> conține doar codul care știe formatul JSON. <code>Produs</code> nu știe nimic despre JSON.</li>
+          </ul>
+        </div>
+        <div class="block">
+          <span class="eyebrow">Ce am scris, pas cu pas</span>
+          <ol>
+            <li>Creez o listă goală, în care adaug produsele.</li>
+            <li><code>new JSONArray(text)</code> transformă textul în vector.</li>
+            <li>Parcurg vectorul cu un <code>for</code> și iau fiecare obiect cu <code>getJSONObject(i)</code>.</li>
+            <li>Citesc denumirea cu <code>optString("denumire", "")</code>, care întoarce <code>""</code> dacă cheia lipsește. Dacă e goală, <code>continue</code> sare la următorul obiect.</li>
+            <li>Citesc <code>pret</code> cu <code>getDouble</code> și <code>stoc</code> cu <code>getInt</code>, creez un <code>Produs</code> și îl adaug în listă.</li>
+          </ol>
+        </div>
+<pre><code class="java">public static List&lt;Produs&gt; dinText(String text) throws Exception {
+    List&lt;Produs&gt; produse = new ArrayList&lt;&gt;();
+
+    // textul este un vector JSON: [ {...}, {...}, ... ]
+    JSONArray vector = new JSONArray(text);
+
+    for (int i = 0; i &lt; vector.length(); i++) {
+        JSONObject obiect = vector.getJSONObject(i);
+
+        String denumire = obiect.optString("denumire", "");
+        // sarim inregistrarile cu denumirea goala
+        if (denumire.trim().isEmpty()) {
+            continue;
+        }
+
+        double pret = obiect.getDouble("pret");
+        int stoc = obiect.getInt("stoc");
+
+        produse.add(new Produs(denumire, pret, stoc));
+    }
+
+    return produse;
+}</code></pre>
+        <div class="io">
+          <div>
+            <span class="eyebrow">Intră (din test)</span>
+<pre><code>[
+  {"denumire":"Pâine","pret":5.5,"stoc":10},
+  {"denumire":"","pret":1,"stoc":1},
+  {"denumire":"Lapte","pret":8,"stoc":0}
+]</code></pre>
+          </div>
+          <div>
+            <span class="eyebrow">Iese</span>
+<pre><code>[Produs{denumire='Pâine', pret=5.5, stoc=10},
+ Produs{denumire='Lapte', pret=8.0, stoc=0}]
+
+// al doilea obiect a fost sarit:
+// are denumirea goala</code></pre>
+          </div>
+        </div>
+        <div class="callout">
+          <strong>De ce <code>org.json</code>?</strong>
+          <p>E biblioteca de JSON inclusă în Android. Testele rulează însă pe calculator, iar acolo clasele Android sunt doar niște „cutii goale” care întorc 0 sau <code>null</code>. De aceea profesorul a adăugat în <code>app/build.gradle.kts</code> linia <code>testImplementation(libs.org.json)</code>, care aduce varianta reală și la testare. Linia asta e indiciul că trebuia folosit <code>org.json</code>.</p>
+        </div>
+        <div class="traps">
+          <span class="eyebrow">Capcane</span>
+          <ul>
+            <li><code>getString("denumire")</code> aruncă excepție dacă cheia lipsește. <code>optString(..., "")</code> e mai sigur.</li>
+            <li>Întoarce lista goală, nu <code>null</code>, când vectorul e <code>[]</code>. Testul verifică și cazul ăsta.</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <!-- C4 -->
+    <article class="req" id="c4">
+      <div class="req-head">
+        <div class="req-meta"><span class="eyebrow">Cerința 4</span><span class="pts">2p</span></div>
+        <h3>Importul XML</h3>
+        <span class="path">app/src/main/java/ro/ase/dam/examen/xml/ParserXml.java</span>
+      </div>
+      <div class="req-body">
+        <div class="block">
+          <span class="eyebrow">De ce aici</span>
+          <ul>
+            <li>Testul <code>R3_ParserXmlTest</code> o importă din <code>ro.ase.dam.examen.xml.ParserXml</code>.</li>
+            <li>La fel ca la JSON: pachetul <code>xml</code> conține doar codul care știe formatul XML.</li>
+          </ul>
+        </div>
+        <div class="block">
+          <span class="eyebrow">Ce am scris, pas cu pas</span>
+          <ol>
+            <li>Construiesc un parser DOM cu <code>DocumentBuilderFactory</code>. DOM citește tot XML-ul și îl transformă într-un arbore de noduri.</li>
+            <li>XML-ul vine ca <code>String</code>, nu ca fișier, deci îl dau parserului prin <code>new InputSource(new StringReader(text))</code>. Așa diacriticele din „Pâine” se citesc corect.</li>
+            <li><code>getElementsByTagName("produs")</code> îmi dă toate nodurile <code>&lt;produs&gt;</code>.</li>
+            <li>Pentru fiecare, citesc <code>&lt;denumire&gt;</code>, <code>&lt;pret&gt;</code> și <code>&lt;stoc&gt;</code> cu metoda ajutătoare <code>textCopil()</code>, ca să nu scriu același cod de 3 ori.</li>
+            <li>Sar peste produsele cu denumirea goală. Textul îl transform în numere cu <code>Double.parseDouble</code> și <code>Integer.parseInt</code>.</li>
+          </ol>
+        </div>
+<pre><code class="java">public static List&lt;Produs&gt; dinText(String text) throws Exception {
+    List&lt;Produs&gt; produse = new ArrayList&lt;&gt;();
+
+    // construim arborele DOM din textul XML
+    DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+    Document document = builder.parse(new InputSource(new StringReader(text)));
+
+    // luam toate nodurile &lt;produs&gt;
+    NodeList noduri = document.getElementsByTagName("produs");
+
+    for (int i = 0; i &lt; noduri.getLength(); i++) {
+        Element produs = (Element) noduri.item(i);
+
+        String denumire = textCopil(produs, "denumire");
+        // sarim inregistrarile cu denumirea goala
+        if (denumire.isEmpty()) {
+            continue;
+        }
+
+        double pret = Double.parseDouble(textCopil(produs, "pret"));
+        int stoc = Integer.parseInt(textCopil(produs, "stoc"));
+
+        produse.add(new Produs(denumire, pret, stoc));
+    }
+
+    return produse;
+}
+
+// textul din primul copil &lt;tag&gt; al elementului, fara spatii la capete ("" daca lipseste)
+private static String textCopil(Element parinte, String tag) {
+    NodeList lista = parinte.getElementsByTagName(tag);
+    if (lista.getLength() == 0) {
+        return "";
+    }
+    return lista.item(0).getTextContent().trim();
+}</code></pre>
+        <div class="io">
+          <div>
+            <span class="eyebrow">Intră (din test)</span>
+<pre><code>&lt;produse&gt;
+  &lt;produs&gt;&lt;denumire&gt;Pâine&lt;/denumire&gt;&lt;pret&gt;5.5&lt;/pret&gt;&lt;stoc&gt;10&lt;/stoc&gt;&lt;/produs&gt;
+  &lt;produs&gt;&lt;denumire&gt;&lt;/denumire&gt;&lt;pret&gt;1&lt;/pret&gt;&lt;stoc&gt;1&lt;/stoc&gt;&lt;/produs&gt;
+  &lt;produs&gt;&lt;denumire&gt;Lapte&lt;/denumire&gt;&lt;pret&gt;8&lt;/pret&gt;&lt;stoc&gt;0&lt;/stoc&gt;&lt;/produs&gt;
+&lt;/produse&gt;</code></pre>
+          </div>
+          <div>
+            <span class="eyebrow">Iese</span>
+<pre><code>[Produs{denumire='Pâine', pret=5.5, stoc=10},
+ Produs{denumire='Lapte', pret=8.0, stoc=0}]</code></pre>
+          </div>
+        </div>
+        <div class="callout">
+          <strong>De ce DOM și nu <code>XmlPullParser</code>?</strong>
+          <p><code>XmlPullParser</code> vine din Android. În testele de pe calculator ar fi fost o „cutie goală”: <code>Xml.newPullParser()</code> întoarce <code>null</code> și testul crapă. Spre deosebire de JSON, aici profesorul nu a adăugat o bibliotecă de test. DOM (<code>javax.xml.parsers</code>) face parte din Java standard, deci merge <strong>și pe telefon, și în teste</strong>.</p>
+          <p>Dacă la proba reală ți se cere explicit <code>XmlPullParser</code>, folosește-l pe acela. Probabil profesorul va adăuga atunci și biblioteca de test potrivită.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- C5 -->
+    <article class="req" id="c5">
+      <div class="req-head">
+        <div class="req-meta"><span class="eyebrow">Cerința 5</span><span class="pts">2p</span></div>
+        <h3>Filtrarea produselor în stoc</h3>
+        <span class="path">app/src/main/java/ro/ase/dam/examen/domeniu/ProduseService.java</span>
+      </div>
+      <div class="req-body">
+        <div class="block">
+          <span class="eyebrow">De ce aici</span>
+          <ul>
+            <li>Testul <code>R4_ServiceTest</code> o importă din <code>ro.ase.dam.examen.domeniu.ProduseService</code>.</li>
+            <li>Un „service” conține operații pe produse (logica aplicației). Nu ține de JSON sau XML, deci stă în <code>domeniu</code>.</li>
+          </ul>
+        </div>
+        <div class="block">
+          <span class="eyebrow">Ce am scris, pas cu pas</span>
+          <ol>
+            <li>Creez o <strong>listă nouă</strong> pentru rezultat. Pe cea primită nu o modific.</li>
+            <li>Dacă sursa e <code>null</code> sau goală, întorc lista nouă, care e goală. Niciodată nu întorc <code>null</code>.</li>
+            <li>Parcurg sursa și adaug în rezultat doar produsele cu <code>getStoc() &gt; 0</code>. Sar peste elementele <code>null</code>, ca să nu crape.</li>
+          </ol>
+        </div>
+<pre><code class="java">public static List&lt;Produs&gt; filtreazaInStoc(List&lt;Produs&gt; sursa) {
+    // lista noua: nu modificam lista primita
+    List&lt;Produs&gt; rezultat = new ArrayList&lt;&gt;();
+
+    // sursa null sau goala -&gt; lista goala (nu null)
+    if (sursa == null || sursa.isEmpty()) {
+        return rezultat;
+    }
+
+    for (Produs p : sursa) {
+        // pastram doar produsele cu stoc strict pozitiv
+        if (p != null &amp;&amp; p.getStoc() &gt; 0) {
+            rezultat.add(p);
+        }
+    }
+
+    return rezultat;
+}</code></pre>
+        <div class="io">
+          <div>
+            <span class="eyebrow">Intră</span>
+<pre><code>[A (stoc 5), B (stoc 0), C (stoc 3)]</code></pre>
+          </div>
+          <div>
+            <span class="eyebrow">Iese</span>
+<pre><code>[A, C]   // B are stoc 0, nu e „în stoc”</code></pre>
+          </div>
+        </div>
+        <div class="traps">
+          <span class="eyebrow">Capcane</span>
+          <ul>
+            <li>Testul șterge un element din lista sursă și verifică dacă rezultatul a rămas la fel. Dacă întorci aceeași listă sau o modifici cu <code>sursa.removeIf(...)</code>, pierzi punctele.</li>
+            <li>Pentru <code>null</code> întorci lista goală, nu <code>null</code>.</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- STUDIO -->
+  <section id="studio" aria-labelledby="h-studio">
+    <span class="eyebrow">Navigare</span>
+    <h2 id="h-studio">Cum găsești fișierele în Android Studio</h2>
+    <div class="prose">
+      <p><strong>Panoul Project</strong> (stânga, <kbd>Alt</kbd>+<kbd>1</kbd>) are sus un meniu cu mai multe vederi:</p>
+      <ul style="margin:0;padding-left:22px;display:grid;gap:6px">
+        <li><strong>Android</strong> (implicit) ascunde fișierele generate și grupează tot pe categorii: <code>app → manifests</code>, <code>java</code> (în unele versiuni apare ca <code>kotlin+java</code>), <code>res</code>, plus <code>Gradle Scripts</code>. Pachetul de teste apare ca <code>ro.ase.dam.examen (test)</code>. E cea mai simplă pentru lucru.</li>
+        <li><strong>Project</strong> arată folderele reale de pe disc, inclusiv <code>build/</code>, <code>.gradle/</code> etc., ca în harta de mai sus.</li>
+      </ul>
+    </div>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>Scurtătură</th><th>Ce face</th><th>Exemplu</th></tr></thead>
+        <tbody>
+          <tr><td><kbd>Shift</kbd> de două ori</td><td>Caută orice: fișiere, clase, acțiuni</td><td>scrii <code>Validator</code> → Enter</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>N</kbd></td><td>Deschide un fișier după nume</td><td><code>ENUNT.md</code></td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>N</kbd></td><td>Deschide o clasă după nume</td><td><code>ParserXml</code></td></tr>
+          <tr><td><kbd>Ctrl</kbd>+Click sau <kbd>Ctrl</kbd>+<kbd>B</kbd></td><td>Sare la fișierul clasei pe care ai dat click</td><td>în test, <kbd>Ctrl</kbd>+Click pe <code>Validator</code> te duce în <code>Validator.java</code></td></tr>
+          <tr><td><kbd>Alt</kbd>+<kbd>F1</kbd>, apoi <em>Project View</em></td><td>Îți arată în arbore unde e fișierul deschis</td><td>vezi exact folderul</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>E</kbd></td><td>Fișierele deschise recent</td><td>treci repede de la test la cod</td></tr>
+          <tr><td><em>View → Tool Windows → TODO</em></td><td>Lista tuturor <code>// TODO</code> din proiect</td><td>vezi toate locurile de completat</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout">
+      <strong>Cel mai rapid drum la examen</strong>
+      <p>Deschizi testul unei cerințe, de exemplu <code>R2_ValidatorTest</code>, și dai <kbd>Ctrl</kbd>+Click pe numele clasei testate. Ajungi direct în fișierul în care trebuie să scrii și vezi în același timp ce se verifică.</p>
+    </div>
+  </section>
+
+  <!-- TESTE -->
+  <section id="teste" aria-labelledby="h-teste">
+    <span class="eyebrow">Verificare</span>
+    <h2 id="h-teste">Rulezi testele și predai</h2>
+    <div class="prose">
+      <h3>Rularea testelor</h3>
+      <p>Deschide terminalul din Android Studio (<kbd>Alt</kbd>+<kbd>F12</kbd>) și scrie:</p>
+    </div>
+<pre><code>.\gradlew test</code></pre>
+    <div class="prose">
+      <p>Altă variantă: apasă de două ori pe <kbd>Ctrl</kbd> (<em>Run Anything</em>) și scrie <code>gradle test</code>. În versiunile noi de Android Studio, lista de task-uri din panoul Gradle (dreapta) poate fi goală. Atunci folosește una dintre cele două variante de mai sus.</p>
+      <p>La final, testele tale afișează:</p>
+    </div>
+<div class="result">R0_ModelTest &gt; r0a_constructorSiGettersSiSetters <span class="ok">PASSED</span>
+R2_ValidatorTest &gt; r2a_validareProdus <span class="ok">PASSED</span>
+R3_ParserJsonTest &gt; r3a_ignoraDenumireGoala <span class="ok">PASSED</span>
+R3_ParserJsonTest &gt; r3b_mapeazaCampurile <span class="ok">PASSED</span>
+R3_ParserXmlTest &gt; r3a_ignoraDenumireGoala <span class="ok">PASSED</span>
+R3_ParserXmlTest &gt; r3b_mapeazaCampurile <span class="ok">PASSED</span>
+R4_ServiceTest &gt; r4a_filtreazaInStoc <span class="ok">PASSED</span>
+========================================
+PUNCTAJ ESTIMAT: <span class="ok">10.0 / 10.0</span>
+========================================</div>
+
+    <div class="prose">
+      <h3>Predarea pe Moodle</h3>
+      <p>În același terminal:</p>
+    </div>
+<pre><code>.\gradlew zipPentruMoodle</code></pre>
+    <p class="prose">Arhiva apare în folderul <code>moodle/</code> din rădăcina proiectului și conține doar <code>app/src/main</code>. De aceea tot codul trebuie să fie acolo.</p>
+
+    <div class="callout warn">
+      <strong>Dacă build-ul pică cu „Unable to delete directory”</strong>
+      <p>Proiectul e pe Desktop, care e sincronizat în OneDrive. OneDrive poate bloca folderele de build. Rezolvi cu <em>Build → Clean Project</em> sau ștergând folderul <code>app/build</code>, care se regenerează automat. Ca să scapi definitiv de problemă, ține proiectele într-un folder care nu e în OneDrive, de exemplu <code>C:\Proiecte\</code>.</p>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section id="checklist" aria-labelledby="h-check">
+    <span class="eyebrow">La proba reală</span>
+    <h2 id="h-check">Checklist pentru examen</h2>
+    <ol class="steps">
+      <li><strong>Citește <code>ENUNT.md</code></strong> și notează-ți punctajul fiecărei cerințe. Începe cu cele care valorează mai mult sau sunt mai simple.</li>
+      <li><strong>Deschide fereastra TODO</strong> (<em>View → Tool Windows → TODO</em>) ca să vezi toate locurile în care trebuie să scrii.</li>
+      <li><strong>Rezolvă întâi modelul.</strong> Toate celelalte cerințe depind de el.</li>
+      <li><strong>Pentru fiecare cerință, citește întâi testul.</strong> Vezi exact ce valori intră și ce trebuie să iasă, inclusiv cazurile ciudate: <code>null</code>, listă goală, 0.</li>
+      <li><strong>Scrie codul în fișierul cu TODO.</strong> Nu muta fișierul, nu-l redenumi și nu schimba semnătura metodei: numele, parametrii și tipul întors rămân cum sunt.</li>
+      <li><strong>Rulează testele după fiecare cerință</strong> (<code>.\gradlew test</code>), nu doar la final. Așa știi imediat ce ai stricat.</li>
+      <li><strong>Predă:</strong> rulezi <code>.\gradlew zipPentruMoodle</code> și urci arhiva din <code>moodle/</code>.</li>
+    </ol>
+    <div class="prose">
+      <h3>Ce nu atingi niciodată</h3>
+      <p>Testele din <code>src/test</code>, fișierele <code>build.gradle.kts</code>, folderul <code>gradle/</code> și folderele generate (<code>build/</code>, <code>.gradle/</code>, <code>.idea/</code>).</p>
+    </div>
+  </section>
+
+  <footer>Punctajul din teste e orientativ. Nota finală se stabilește și printr-o verificare manuală a codului, deci contează și ca soluția să fie scrisă curat, nu doar să treacă testele.</footer>
+</div>
+
+<script>
+  (function () {
+    // evidențiere simplă de sintaxă Java pentru blocurile de cod
+    var KW = 'package|import|public|private|protected|static|final|class|return|new|if|else|for|continue|throws|throw|void|int|double|boolean|null|true|false|this';
+    var re = new RegExp('(\\/\\/[^\\n]*|\\/\\*[\\s\\S]*?\\*\\/)|("(?:[^"\\\\\\n]|\\\\.)*"|\'(?:[^\'\\\\\\n]|\\\\.)*\')|(@[A-Za-z]+)|\\b(' + KW + ')\\b|\\b(\\d+(?:\\.\\d+)?)\\b|\\b([A-Z][A-Za-z0-9_]*)\\b', 'g');
+    function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+    function hl(src) {
+      var out = '', last = 0, m;
+      re.lastIndex = 0;
+      while ((m = re.exec(src)) !== null) {
+        out += esc(src.slice(last, m.index));
+        var cls = m[1] ? 'c' : m[2] ? 's' : m[3] ? 'a' : m[4] ? 'k' : m[5] ? 'n' : 't';
+        out += '<span class="' + cls + '">' + esc(m[0]) + '</span>';
+        last = re.lastIndex;
+      }
+      return out + esc(src.slice(last));
+    }
+    try {
+      document.querySelectorAll('pre code.java').forEach(function (el) { el.innerHTML = hl(el.textContent); });
+    } catch (e) { /* codul rămâne afișat simplu */ }
+
+    // comutare: tot proiectul / doar ce contează
+    var box = document.getElementById('tree');
+    var all = document.getElementById('btn-all');
+    var focus = document.getElementById('btn-focus');
+    function set(onlyImportant) {
+      box.classList.toggle('focus', onlyImportant);
+      all.setAttribute('aria-pressed', String(!onlyImportant));
+      focus.setAttribute('aria-pressed', String(onlyImportant));
+    }
+    all.addEventListener('click', function () { set(false); });
+    focus.addEventListener('click', function () { set(true); });
+  })();
+</script>
+</body>
+</html>
