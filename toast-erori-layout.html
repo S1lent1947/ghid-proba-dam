@@ -140,6 +140,12 @@
   .flow .node span { font-size: 13px; color: var(--muted); }
   .flow .arrow { align-self: center; font-family: var(--font-display); font-size: 22px; color: var(--accent); }
   @media (max-width: 640px) { .flow { flex-direction: column; } .flow .node { flex: none; } .flow .arrow { transform: rotate(90deg); line-height: 1; } }
+  .phone.tall { padding-bottom: 84px; }
+  .mock-check { font-size: 13px; }
+  .mock-btns { display: flex; gap: 6px; }
+  .mock-btn { flex: 1; text-align: center; background: var(--accent); color: var(--surface); border-radius: 6px; font-size: 12px; font-weight: 600; padding: 6px 4px; }
+  .mock-result { font-size: 14px; font-weight: 600; padding-top: 4px; }
+  .toast-pill { left: 12px; right: 12px; transform: none; width: fit-content; margin-inline: auto; white-space: normal; text-align: center; }
 </style>
 </head>
 <body>
@@ -159,6 +165,7 @@
       <a href="#seterror">Erori pe câmpuri (setError)</a>
       <a href="#trycatch">Erori care crapă aplicația (try/catch)</a>
       <a href="#layout">Layout-uri</a>
+      <a href="#exemplu">Exemplu complet</a>
       <a href="#capcane">Capcane</a>
     </nav>
   </header>
@@ -511,6 +518,365 @@ setContentView(binding.getRoot());</code></pre>
 <pre><code data-lang="java">convertView = LayoutInflater.from(context).inflate(R.layout.item_anunt, parent, false);
 holder.tvTitlu = convertView.findViewById(R.id.tvTitlu);</code></pre>
     </div>
+  </section>
+
+  <!-- EXEMPLU COMPLET -->
+  <section id="exemplu" aria-labelledby="h-exemplu">
+    <span class="eyebrow">4 · Toate trei într-un ecran adevărat</span>
+    <h2 id="h-exemplu">Exemplu complet: un ecran de la zero</h2>
+    <p class="prose">Facem un ecran nou, <strong>Calculator stoc</strong>: scrii produsul, prețul și cantitatea, bifezi reducerea și apeși <strong>Calculează</strong>. Are layout, binding, <code>setError</code>, <code>try/catch</code> și Toast. Codul de mai jos e compilat în proiectul <code>Model_Proba3_DAM_Extins</code>, deci îl poți copia exact așa.</p>
+
+    <div class="demo">
+      <div class="block">
+        <div class="phone tall" role="img" aria-label="Calculator stoc cu erori: produs gol, preț 0 și cantitate 150 marcate cu roșu, Toast Corectează câmpurile marcate cu roșu">
+          <div class="bar">Calculator stoc</div>
+          <div class="field"><span>Produs</span><span class="err-icon">!</span></div>
+          <div class="field"><span>0</span><span class="err-icon">!</span></div>
+          <div class="bubble">Prețul trebuie să fie mai mare ca 0</div>
+          <div class="field"><span>150</span><span class="err-icon">!</span></div>
+          <div class="mock-check">☐ Reducere 10%</div>
+          <div class="mock-btns"><span class="mock-btn">Calculează</span><span class="mock-btn">Golește</span></div>
+          <div class="mock-result">Total: -</div>
+          <div class="toast-pill">Corectează câmpurile marcate cu roșu</div>
+        </div>
+        <p class="demo-cap"><strong>Cu greșeli:</strong> fiecare câmp greșit primește „!”, apare un Toast și nu se calculează nimic.</p>
+      </div>
+      <div class="block">
+        <div class="phone tall" role="img" aria-label="Calculator stoc completat corect: Laptop, 1200, 3, reducere bifată, Total pentru Laptop 3240.00 lei, Toast Gata, am calculat!">
+          <div class="bar">Calculator stoc</div>
+          <div class="field ok"><span>Laptop</span></div>
+          <div class="field ok"><span>1200</span></div>
+          <div class="field ok"><span>3</span></div>
+          <div class="mock-check">☑ Reducere 10%</div>
+          <div class="mock-btns"><span class="mock-btn">Calculează</span><span class="mock-btn">Golește</span></div>
+          <div class="mock-result">Total pentru Laptop: 3240.00 lei</div>
+          <div class="toast-pill">Gata, am calculat!</div>
+        </div>
+        <p class="demo-cap"><strong>Corect:</strong> 1200 × 3 = 3600, minus 10% = 3240. Rezultatul apare în <code>tvRezultat</code>.</p>
+      </div>
+    </div>
+
+    <article class="req" id="ex-pas1">
+      <div class="req-head">
+        <div class="req-meta"><span class="eyebrow">Pasul 1 · Layout-ul</span></div>
+        <h3>Cum arată ecranul</h3>
+        <span class="path">res/layout/activity_calcul.xml</span>
+      </div>
+      <div class="req-body">
+        <div class="block">
+          <span class="eyebrow">Ce faci</span>
+          <ol>
+            <li>Click dreapta pe <code>res/layout</code> → <strong>New → Layout Resource File</strong> → nume <code>activity_calcul</code> → <strong>OK</strong>.</li>
+            <li><strong>Code</strong> (sus în dreapta), ștergi tot și lipești codul de mai jos.</li>
+          </ol>
+        </div>
+<pre><code data-lang="xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;!-- ScrollView: dacă ecranul e mic, poți derula. Are voie la UN singur copil. --&gt;
+&lt;ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"&gt;
+
+    &lt;!-- Copilul unic: un LinearLayout care pune totul unul sub altul --&gt;
+    &lt;LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp"&gt;
+
+        &lt;!-- Titlu fără id: nu-l modificăm din Java, deci nu ne trebuie id --&gt;
+        &lt;TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="12dp"
+            android:text="Calculator stoc"
+            android:textSize="22sp"
+            android:textStyle="bold" /&gt;
+
+        &lt;EditText
+            android:id="@+id/etProdus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Produs"
+            android:inputType="text" /&gt;
+
+        &lt;!-- numberDecimal: tastatura are doar cifre și punct --&gt;
+        &lt;EditText
+            android:id="@+id/etPret"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Preț (lei)"
+            android:inputType="numberDecimal" /&gt;
+
+        &lt;!-- number: doar cifre, fără punct --&gt;
+        &lt;EditText
+            android:id="@+id/etCantitate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Cantitate (1-100)"
+            android:inputType="number" /&gt;
+
+        &lt;CheckBox
+            android:id="@+id/chkReducere"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Reducere 10%" /&gt;
+
+        &lt;!-- Două butoane unul lângă altul: LinearLayout orizontal.
+             width="0dp" + layout_weight="1" = își împart lățimea egal --&gt;
+        &lt;LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"&gt;
+
+            &lt;Button
+                android:id="@+id/btnCalculeaza"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Calculează" /&gt;
+
+            &lt;Button
+                android:id="@+id/btnGoleste"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Golește" /&gt;
+        &lt;/LinearLayout&gt;
+
+        &lt;!-- Aici scriem rezultatul din Java, deci are id --&gt;
+        &lt;TextView
+            android:id="@+id/tvRezultat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="16dp"
+            android:text="Total: -"
+            android:textSize="18sp" /&gt;
+    &lt;/LinearLayout&gt;
+&lt;/ScrollView&gt;</code></pre>
+        <div class="callout">
+          <strong>De reținut din layout</strong>
+          <ul>
+            <li>Doar elementele pe care le folosești din Java au <code>id</code>. Titlul „Calculator stoc” n-are, pentru că nu-l schimbăm niciodată.</li>
+            <li>Din <code>activity_calcul.xml</code> se generează <code>ActivityCalculBinding</code>, iar fiecare id devine un câmp: <code>etProdus</code> → <code>binding.etProdus</code>.</li>
+            <li>Butoanele stau unul lângă altul pentru că sunt într-un <code>LinearLayout</code> <code>horizontal</code>, iar <code>layout_width="0dp"</code> + <code>layout_weight="1"</code> le împarte lățimea egal.</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <article class="req" id="ex-pas2">
+      <div class="req-head">
+        <div class="req-meta"><span class="eyebrow">Pasul 2 · Activitatea</span></div>
+        <h3>Ce face ecranul</h3>
+        <span class="path">java/ro/ase/dam/examen/CalculActivity.java</span>
+      </div>
+      <div class="req-body">
+        <div class="block">
+          <span class="eyebrow">Ce faci</span>
+          <ol>
+            <li>Click dreapta pe pachetul <code>ro.ase.dam.examen</code> → <strong>New → Java Class</strong> → <code>CalculActivity</code> → <kbd>Enter</kbd>.</li>
+            <li>Ștergi ce a pus Android Studio și lipești codul de mai jos.</li>
+          </ol>
+        </div>
+<pre><code data-lang="java">package ro.ase.dam.examen;
+
+import android.os.Bundle;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+import ro.ase.dam.examen.databinding.ActivityCalculBinding;
+
+public class CalculActivity extends AppCompatActivity {
+
+    // 1. Legătura cu activity_calcul.xml (clasa e generată automat din numele fișierului)
+    private ActivityCalculBinding binding;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // 2. Încarci layout-ul și îl pui pe ecran
+        binding = ActivityCalculBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
+        // 3. TOAST la pornirea ecranului
+        Toast.makeText(this, "Completează prețul și cantitatea", Toast.LENGTH_SHORT).show();
+
+        // 4. Legi fiecare buton de metoda lui
+        binding.btnCalculeaza.setOnClickListener(v -&gt; calculeaza());
+        binding.btnGoleste.setOnClickListener(v -&gt; goleste());
+    }
+
+    private void calculeaza() {
+        // a. Citești textul din fiecare câmp
+        String produs = binding.etProdus.getText().toString().trim();
+        String pretText = binding.etPret.getText().toString().trim();
+        String cantitateText = binding.etCantitate.getText().toString().trim();
+
+        boolean ok = true;   // devine false la prima eroare, dar verificăm tot
+        double pret = 0;
+        int cantitate = 0;
+
+        // b. Verifici fiecare câmp și pui EROAREA pe el (setError)
+        if (produs.isEmpty()) {
+            binding.etProdus.setError("Scrie numele produsului");
+            ok = false;
+        }
+
+        // parseDouble CRAPĂ dacă textul nu e număr -&gt; îl prinzi cu try/catch
+        try {
+            pret = Double.parseDouble(pretText);
+            if (pret &lt;= 0) {
+                binding.etPret.setError("Prețul trebuie să fie mai mare ca 0");
+                ok = false;
+            }
+        } catch (NumberFormatException e) {
+            binding.etPret.setError("Scrie un număr, de exemplu 12.5");
+            ok = false;
+        }
+
+        try {
+            cantitate = Integer.parseInt(cantitateText);
+            if (cantitate &lt; 1 || cantitate &gt; 100) {
+                binding.etCantitate.setError("Cantitatea trebuie să fie între 1 și 100");
+                ok = false;
+            }
+        } catch (NumberFormatException e) {
+            binding.etCantitate.setError("Scrie un număr întreg");
+            ok = false;
+        }
+
+        // c. Dacă e vreo eroare: Toast + te oprești
+        if (!ok) {
+            Toast.makeText(this, "Corectează câmpurile marcate cu roșu", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // d. Totul e corect: calculezi și afișezi
+        double total = pret * cantitate;
+        if (binding.chkReducere.isChecked()) {
+            total = total * 0.9;
+        }
+        // String.format("%.2f", ...) = două zecimale
+        binding.tvRezultat.setText("Total pentru " + produs + ": "
+                + String.format("%.2f", total) + " lei");
+        Toast.makeText(this, "Gata, am calculat!", Toast.LENGTH_SHORT).show();
+    }
+
+    private void goleste() {
+        // setText("") golește câmpul
+        binding.etProdus.setText("");
+        binding.etPret.setText("");
+        binding.etCantitate.setText("");
+
+        // setError(null) șterge erorile rămase de la ultimul calcul
+        binding.etProdus.setError(null);
+        binding.etPret.setError(null);
+        binding.etCantitate.setError(null);
+
+        binding.chkReducere.setChecked(false);
+        binding.tvRezultat.setText("Total: -");
+        Toast.makeText(this, "Am golit formularul", Toast.LENGTH_SHORT).show();
+    }
+}</code></pre>
+        <div class="tbl">
+          <table>
+            <thead><tr><th>Ce scrii</th><th>Ce se întâmplă</th></tr></thead>
+            <tbody>
+              <tr><td>nimic, apeși Calculează</td><td>„!” pe toate trei câmpurile; Toast „Corectează câmpurile marcate cu roșu”</td></tr>
+              <tr><td>Laptop, preț <code>0</code>, cantitate <code>3</code></td><td>„!” doar pe preț: „Prețul trebuie să fie mai mare ca 0”</td></tr>
+              <tr><td>Laptop, <code>1200</code>, <code>150</code></td><td>„!” doar pe cantitate: „…între 1 și 100”</td></tr>
+              <tr><td>Laptop, <code>1200</code>, <code>3</code>, cu reducere</td><td><code>Total pentru Laptop: 3240.00 lei</code> și Toast „Gata, am calculat!”</td></tr>
+              <tr><td>apeși Golește</td><td>câmpurile se golesc, erorile dispar, bifa se scoate, Toast „Am golit formularul”</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="traps">
+          <span class="eyebrow">De ce e nevoie de <code>try/catch</code> aici</span>
+          <p>Dacă lași prețul gol, <code>Double.parseDouble("")</code> aruncă <code>NumberFormatException</code>. Fără <code>try/catch</code> aplicația s-ar închide; cu el, prinzi excepția și pui un <code>setError</code> pe câmp.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="req" id="ex-pas3">
+      <div class="req-head">
+        <div class="req-meta"><span class="eyebrow">Pasul 3 · Manifestul</span></div>
+        <h3>Anunți Android că există ecranul</h3>
+        <span class="path">AndroidManifest.xml</span>
+      </div>
+      <div class="req-body">
+        <p class="prose">O linie lângă celelalte <code>&lt;activity&gt;</code>. Fără ea, aplicația crapă cu <code>ActivityNotFoundException</code> când încerci să deschizi ecranul.</p>
+<pre><code data-lang="xml">&lt;activity android:name=".CalculActivity" android:exported="false" /&gt;</code></pre>
+      </div>
+    </article>
+
+    <article class="req" id="ex-pas4">
+      <div class="req-head">
+        <div class="req-meta"><span class="eyebrow">Pasul 4 · Cum ajungi la el</span></div>
+        <h3>O opțiune nouă în meniul ⋮</h3>
+        <span class="path">res/menu/menu_main.xml + MainActivity.java</span>
+      </div>
+      <div class="req-body">
+        <div class="block">
+          <span class="eyebrow">În meniu: un item nou, sub „Despre”</span>
+<pre><code data-lang="xml">&lt;item android:id="@+id/action_calcul" android:title="Calculator stoc" /&gt;</code></pre>
+        </div>
+        <div class="block">
+          <span class="eyebrow">În MainActivity: metoda meniului întreagă, cu ramura nouă la final</span>
+          <p class="prose">Tot aici vezi un <code>try/catch</code> adevărat: dacă fișierul din <code>assets</code> lipsește sau e stricat, se afișează un Toast în loc să se închidă aplicația. <code>citesteAsset</code> are <code>throws Exception</code>, deci cine o apelează trebuie să o pună în <code>try</code>.</p>
+<pre><code data-lang="java">// ... restul clasei ...
+
+@Override public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    int id = item.getItemId();
+    try
+    {
+        if(id == R.id.action_json)
+        {
+            importa(ParserJson.dinText(citesteAsset("anunturi_demo.json")));
+            return true;
+        }
+        if(id == R.id.action_xml)
+        {
+            importa(ParserXml.dinText(citesteAsset("anunturi_demo.xml")));
+            return true;
+        }
+    }
+    catch(Exception e)
+    {
+        Toast.makeText(this, "Eroare la import: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        return true;
+    }
+    if(id == R.id.action_bnr)
+    {
+        startActivity(new Intent(this, BnrActivity.class));
+        return true;
+    }
+    if(id == R.id.action_info)
+    {
+        startActivity(new Intent(this, InfoActivity.class));
+        return true;
+    }
+    if(id == R.id.action_calcul)
+    {
+        startActivity(new Intent(this, CalculActivity.class));
+        return true;
+    }
+    return super.onOptionsItemSelected(item);
+}
+
+// Citeste un asset text, util pentru TODO 10.
+private String citesteAsset(String nume) throws Exception {
+    try (java.io.InputStream in = getAssets().open(nume);
+         java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream()) {
+        byte[] buffer = new byte[4096];
+        int n;
+        while ((n = in.read(buffer)) != -1) out.write(buffer, 0, n);
+        return out.toString("UTF-8");
+    }
+}</code></pre>
+        </div>
+        <p class="prose">Pornești aplicația, apeși <strong>⋮ → Calculator stoc</strong> și se deschide ecranul. Butonul înapoi al telefonului te duce în listă.</p>
+      </div>
+    </article>
   </section>
 
   <!-- CAPCANE -->
