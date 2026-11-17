@@ -1,0 +1,861 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Modelul extins DAM (Proba 3): pașii de rezolvare pentru toate cele 11 cerințe, cum faci un Toast, cum vezi interfața unei activități și cum rulezi testele.">
+<title>Ghid Proba 3 DAM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+  /* Aceleași culori și fonturi ca primul ghid; o coloană de lectură, câte un card pentru fiecare pas */
+  :root {
+    --bg: #F4F6F2; --surface: #FFFFFF; --fg: #1B2220; --muted: #59645F; --line: #D9DFDA;
+    --accent: #0E6B5A; --accent-soft: #DFEFE9; --mark: #FFE36E; --mark-fg: #362B00;
+    --test: #5646C2; --test-soft: #EBE8FB; --code-bg: #EDF1EC; --ok: #1C7A3E; --bad: #B3261E;
+    --k: #8A3FB0; --s: #1F7A3A; --c: #76827D; --n: #B5521B; --t: #0E5C8C; --a: #8E6400;
+    --font-display: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+    --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, Consolas, "Courier New", monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #111614; --surface: #181E1C; --fg: #E2E8E4; --muted: #9AA7A2; --line: #2A3330;
+      --accent: #4CC2A6; --accent-soft: #15302A; --mark: #4B4013; --mark-fg: #FFE58A;
+      --test: #ADA1FF; --test-soft: #241F45; --code-bg: #0D1211; --ok: #6FD08F; --bad: #FF8A80;
+      --k: #D59DF2; --s: #8DD79C; --c: #72807B; --n: #F0A272; --t: #7CC1F0; --a: #E3B95A;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #111614; --surface: #181E1C; --fg: #E2E8E4; --muted: #9AA7A2; --line: #2A3330;
+    --accent: #4CC2A6; --accent-soft: #15302A; --mark: #4B4013; --mark-fg: #FFE58A;
+    --test: #ADA1FF; --test-soft: #241F45; --code-bg: #0D1211; --ok: #6FD08F; --bad: #FF8A80;
+    --k: #D59DF2; --s: #8DD79C; --c: #72807B; --n: #F0A272; --t: #7CC1F0; --a: #E3B95A;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.6; }
+  .wrap {
+    max-width: 880px; margin: 0 auto;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 40px 72px; display: grid; gap: 56px;
+  }
+  h1, h2, h3 { font-family: var(--font-display); line-height: 1.2; text-wrap: balance; margin: 0; }
+  h1 { font-size: clamp(30px, 5vw, 42px); font-weight: 700; letter-spacing: -0.01em; }
+  h2 { font-size: 26px; font-weight: 700; }
+  h3 { font-size: 19px; font-weight: 700; }
+  p { margin: 0; }
+  a { color: var(--accent); text-underline-offset: 3px; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  code, kbd { font-family: var(--font-mono); font-size: 0.88em; }
+  :not(pre) > code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+  kbd { display: inline-block; padding: 1px 7px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; background: var(--surface); white-space: nowrap; }
+  .eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  section { display: grid; gap: 20px; min-width: 0; }
+  .lead { font-size: 18px; color: var(--muted); max-width: 65ch; }
+  .prose { max-width: 68ch; display: grid; gap: 12px; }
+  .prose ul, .prose ol { margin: 0; padding-left: 22px; display: grid; gap: 6px; }
+
+  header { display: grid; gap: 18px; }
+  .back { font-size: 14px; }
+  .funnel { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+  .funnel .step { flex: 1 1 160px; min-width: 0; padding: 14px 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); display: grid; gap: 2px; }
+  .funnel .num { font-family: var(--font-display); font-size: 34px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .funnel .lbl { font-size: 14px; color: var(--muted); }
+  .funnel .step.hot { background: var(--mark); border-color: transparent; }
+  .funnel .step.hot .num, .funnel .step.hot .lbl { color: var(--mark-fg); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; }
+  nav.toc a { text-decoration: none; }
+  nav.toc a:hover { text-decoration: underline; }
+
+  .req { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; scroll-margin-top: 16px; min-width: 0; }
+  .req-head { padding: 18px 20px 14px; display: grid; gap: 8px; border-bottom: 1px solid var(--line); }
+  .req-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+  .pts { font-family: var(--font-mono); font-size: 12px; padding: 1px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  .tst { font-family: var(--font-mono); font-size: 12px; padding: 1px 8px; border-radius: 999px; background: var(--test-soft); color: var(--test); font-weight: 600; }
+  .path { font-family: var(--font-mono); font-size: 13px; background: var(--mark); color: var(--mark-fg); padding: 4px 10px; border-radius: 6px; overflow-wrap: anywhere; justify-self: start; max-width: 100%; }
+  .req-body { padding: 18px 20px 20px; display: grid; gap: 18px; min-width: 0; }
+  .block { display: grid; gap: 8px; min-width: 0; }
+  .block > .eyebrow { color: var(--fg); font-weight: 600; }
+  .block ul, .block ol { margin: 0; padding-left: 22px; display: grid; gap: 6px; }
+  .traps { border-left: 3px solid var(--bad); padding: 10px 14px; background: color-mix(in srgb, var(--bad) 7%, var(--surface)); border-radius: 0 8px 8px 0; display: grid; gap: 6px; }
+  .traps .eyebrow { color: var(--bad); }
+
+  pre { margin: 0; background: var(--code-bg); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; overflow-x: auto; font-family: var(--font-mono); font-size: 13px; line-height: 1.55; tab-size: 4; }
+  pre code { font-size: inherit; }
+  .k { color: var(--k); font-weight: 600; } .s { color: var(--s); } .c { color: var(--c); font-style: italic; }
+  .n { color: var(--n); } .t { color: var(--t); } .a { color: var(--a); }
+
+  .io { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
+  .io > div { min-width: 0; display: grid; gap: 6px; align-content: start; }
+
+  .tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  th { font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); background: var(--code-bg); }
+  td code { white-space: nowrap; }
+  td a { text-decoration: none; }
+
+  .steps { margin: 0; padding-left: 24px; display: grid; gap: 10px; max-width: 68ch; }
+  .steps li::marker { font-family: var(--font-display); font-weight: 700; color: var(--accent); }
+  .callout { background: var(--accent-soft); border-radius: 12px; padding: 16px 18px; display: grid; gap: 8px; }
+  .callout.warn { background: color-mix(in srgb, var(--mark) 55%, var(--surface)); }
+  .callout ul { margin: 0; padding-left: 22px; display: grid; gap: 6px; }
+  .result { font-family: var(--font-mono); font-size: 13px; background: var(--code-bg); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; overflow-x: auto; white-space: pre; line-height: 1.5; }
+  .result .ok { color: var(--ok); font-weight: 600; }
+  .check { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; max-width: 68ch; }
+  .check li { display: grid; grid-template-columns: 22px 1fr; gap: 8px; }
+  .check li::before { content: ""; width: 16px; height: 16px; margin-top: 4px; border: 2px solid var(--accent); border-radius: 4px; }
+  footer { font-size: 14px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 18px; display: grid; gap: 6px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <a class="back" href="./">← Primul ghid (Proba 1)</a>
+    <span class="eyebrow">Model extins · antrenament · proiectul Model_Proba3_DAM_Extins</span>
+    <h1>Pașii de rezolvare, de la 0 la 20 de puncte</h1>
+    <p class="lead">Toate cele 11 cerințe, în ordinea în care merită să le rezolvi la examen: întâi logica, unde punctele sunt sigure, apoi ecranele. Plus cum faci un Toast și cum vezi interfața unei activități.</p>
+    <div class="funnel" aria-label="Pe scurt">
+      <div class="step"><span class="num">11</span><span class="lbl">cerințe, verificate de testele R0–R10</span></div>
+      <div class="step"><span class="num">14</span><span class="lbl">fișiere în care scrii (12 Java, 2 layout-uri)</span></div>
+      <div class="step hot"><span class="num">20/20</span><span class="lbl">punctaj estimat cu rezolvarea de aici</span></div>
+    </div>
+    <nav class="toc" aria-label="Cuprins">
+      <a href="#start">Înainte să începi</a>
+      <a href="#harta">Unde scrii fiecare cerință</a>
+      <a href="#p1">Pașii 1–11</a>
+      <a href="#toast">Cum faci un Toast</a>
+      <a href="#interfata">Cum vezi interfața</a>
+      <a href="#teste">Cum rulezi testele</a>
+      <a href="#checklist">Checklist</a>
+    </nav>
+  </header>
+
+  <!-- PASUL 0 -->
+  <section id="start" aria-labelledby="h-start">
+    <span class="eyebrow">Pasul 0 · 5 minute</span>
+    <h2 id="h-start">Înainte să scrii cod</h2>
+    <ol class="steps">
+      <li>În Android Studio: <strong>File → Open</strong> pe folderul rădăcină al proiectului, apoi <strong>Sync Now</strong> și aștepți să termine.</li>
+      <li>Rulezi o dată toate testele (click dreapta pe <code>ro.ase.dam.examen (test)</code> → <strong>Run</strong>). Nu contează că pică; vrei doar să vezi că proiectul <strong>compilează</strong>.</li>
+      <li>Deschizi testele și te uiți la date: ce chei are JSON-ul, ce tag-uri are XML-ul, dacă valorile sunt <em>atribute</em> sau <em>text</em>. Testul îți arată exact ce trebuie să iasă.</li>
+    </ol>
+    <div class="callout warn">
+      <strong>Dacă nu compilează din start</strong>
+      <ul>
+        <li><code>cannot find symbol</code> în <code>ProiectSurse.java</code> la <code>Files.readString</code>: în <code>app/build.gradle.kts</code> schimbi <code>compileSdk = 36</code> în <code>compileSdk = 37</code> și apeși <strong>Sync Now</strong>. Biblioteca Android 36 nu are metoda asta.</li>
+        <li><code>Unable to delete directory</code>: e de la OneDrive. Ștergi folderul <code>app/build</code> și rulezi din nou.</li>
+      </ul>
+    </div>
+    <div class="callout">
+      <strong>Reguli de aur</strong>
+      <ul>
+        <li>Nu atingi testele și fișierele din <code>grading/</code> și <code>support/</code>.</li>
+        <li>Proiectul trebuie să compileze tot timpul. Nu ștergi <code>throw new UnsupportedOperationException("TODO")</code> dacă nu pui codul tău în loc: o metodă fără <code>return</code> strică toate testele, nu doar unul.</li>
+        <li>După fiecare cerință rulezi testul ei, cu ▶ lângă numele clasei.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- HARTA -->
+  <section id="harta" aria-labelledby="h-harta">
+    <span class="eyebrow">Harta</span>
+    <h2 id="h-harta">Unde scrii fiecare cerință</h2>
+    <p class="prose">Toate căile Java sunt în <code>app/src/main/java/ro/ase/dam/examen/</code>, iar layout-urile în <code>app/src/main/res/layout/</code>. Coloana „Pas” e ordinea recomandată.</p>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>Pas</th><th>Cerința</th><th>Fișier</th><th>Test</th><th>Puncte</th></tr></thead>
+        <tbody>
+          <tr><td><a href="#p1">1</a></td><td>1. Model</td><td><code>domeniu/Anunt.java</code></td><td>R0</td><td>2</td></tr>
+          <tr><td><a href="#p2">2</a></td><td>2. Validator</td><td><code>domeniu/Validator.java</code></td><td>R1</td><td>2</td></tr>
+          <tr><td><a href="#p3">3</a></td><td>5. Colecții</td><td><code>domeniu/AnunturiService.java</code></td><td>R4</td><td>2</td></tr>
+          <tr><td><a href="#p4">4</a></td><td>6. SharedPreferences</td><td><code>persistenta/PreferinteService.java</code></td><td>R5</td><td>2</td></tr>
+          <tr><td><a href="#p5">5</a></td><td>3. JSON</td><td><code>json/ParserJson.java</code></td><td>R2</td><td>2</td></tr>
+          <tr><td><a href="#p6">6</a></td><td>4. XML</td><td><code>xml/ParserXml.java</code></td><td>R3</td><td>2</td></tr>
+          <tr><td><a href="#p7">7</a></td><td>11. BNR (logică)</td><td><code>bnr/CursBnrParser.java</code></td><td>R10</td><td>2</td></tr>
+          <tr><td><a href="#p8">8</a></td><td>7. Formular (logică)</td><td><code>formular/FormularValidator.java</code></td><td>R6</td><td>2</td></tr>
+          <tr><td><a href="#p9">9</a></td><td>8. Layout-uri</td><td><code>activity_add.xml</code>, <code>item_anunt.xml</code></td><td>R7</td><td>2</td></tr>
+          <tr><td><a href="#p10">10</a></td><td>9. Adapter</td><td><code>ui/AnuntAdapter.java</code></td><td>R8</td><td>1</td></tr>
+          <tr><td><a href="#p11">11</a></td><td>10. Navigare + 7 și 11 pe ecran</td><td><code>MainActivity.java</code>, <code>AddActivity.java</code>, <code>BnrActivity.java</code></td><td>R9</td><td>1</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- PASII -->
+  <section aria-labelledby="h-pasi">
+    <span class="eyebrow">Rezolvarea</span>
+    <h2 id="h-pasi">Pașii 1–11</h2>
+
+    <!-- P1 -->
+    <article class="req" id="p1">
+      <div class="req-head">
+        <div class="req-meta"><span class="eyebrow">Pasul 1 · Cerința 1</span><span class="pts">2p</span><span class="tst">R0_ModelTest</span></div>
+        <h3>Modelul de domeniu</h3>
+        <span class="path">domeniu/Anunt.java</span>
+      </div>
+      <div class="req-body">
+        <div class="block">
+          <span class="eyebrow">Ce faci</span>
+          <ol>
+            <li>Scrii cele 7 câmpuri <code>private</code>.</li>
+            <li><kbd>Alt</kbd>+<kbd>Insert</kbd> → <strong>Constructor</strong> (selectezi toate câmpurile, în ordinea din enunț) → <strong>Getter and Setter</strong> → <strong>toString()</strong>.</li>
+            <li>Adaugi <code>implements Serializable</code>: îți trebuie la pasul 11, ca să trimiți anunțul printr-un <code>Intent</code>.</li>
+          </ol>
+        </div>
+<pre><code data-lang="java">public class Anunt implements Serializable {
+    private String titlu;
+    private String descriere;
+    private double pret;
+    private int cantitate;
+    private Categorie categorie;
+    private boolean nou;
+    private LocalDate dataPublicare;
+
+    public Anunt(String titlu, String descriere, double pret, int cantitate,
+                 Categorie categorie, boolean nou, LocalDate dataPublicare) {
+        this.titlu = titlu;
+        this.descriere = descriere;
+        this.pret = pret;
+        this.cantitate = cantitate;
+        this.categorie = categorie;
+        this.nou = nou;
+        this.dataPublicare = dataPublicare;
+    }
+
+    // getteri + setteri generați cu Alt+Insert; la boolean getterul e isNou()
+
+    @Override
+    public String toString() {
+        return "Anunt{titlu=" + titlu + ", pret=" + pret + ", categorie=" + categorie + "}";
+    }
+}</code></pre>
+        <div class="traps">
+          <span class="eyebrow">Capcană</span>
+          <p>Dacă parametrii se numesc altfel decât câmpurile (<code>cant</code>, <code>cat</code>, <code>data</code>), atunci <code>this.cantitate = cantitate;</code> pune câmpul peste el însuși și rămâne 0 sau <code>null</code>. De asta lași IDE-ul să genereze constructorul.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- P2 -->
+    <article class="req" id="p2">
+      <div class="req-head">
+        <div class="req-meta"><span class="eyebrow">Pasul 2 · Cerința 2</span><span class="pts">2p</span><span class="tst">R1_ValidatorTest</span></div>
+        <h3>Validatorul de domeniu</h3>
+        <span class="path">domeniu/Validator.java</span>
+      </div>
+      <div class="req-body">
+        <div class="block">
+          <span class="eyebrow">Ce faci</span>
+          <p>Câte un <code>if (...) return false;</code> pentru fiecare regulă din enunț și <code>return true;</code> la final. Verificarea de <code>null</code> vine prima.</p>
+        </div>
+<pre><code data-lang="java">public static boolean esteValid(Anunt a) {
+    if (a == null) return false;
+    if (a.getTitlu() == null || a.getTitlu().trim().isEmpty()) return false;
+    if (a.getDescriere() == null || a.getDescriere().trim().length() &lt; 10) return false;
+    if (a.getPret() &lt;= 0) return false;
+    if (a.getCantitate() &lt; 1 || a.getCantitate() &gt; 100) return false;
+    if (a.getCategorie() == null) return false;
+    if (a.getDataPublicare() == null || a.getDataPublicare().isAfter(LocalDate.now())) return false;
+    return true;
+}</code></pre>
+        <div class="traps">
+          <span class="eyebrow">Capcane</span>
+          <p>Datele nu se compară cu <code>&gt;</code> sau <code>&lt;</code>: folosești <code>isAfter</code>, <code>isBefore</code>, <code>isEqual</code>. La <code>||</code> pui întâi verificarea de <code>null</code>, altfel primești <code>NullPointerException</code>.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- P3 -->
+    <article class="req" id="p3">
+      <div class="req-head">
+        <div class="req-meta"><span class="eyebrow">Pasul 3 · Cerința 5</span><span class="pts">2p</span><span class="tst">R4_ServiceTest</span></div>
+        <h3>Prelucrare colecții și statistici</h3>
+        <span class="path">domeniu/AnunturiService.java</span>
+      </div>
+      <div class="req-body">
+        <div class="block">
+          <span class="eyebrow">Tiparul</span>
+          <p>Listă nouă, ieșire rapidă la <code>null</code>, o buclă care sare peste elementele <code>null</code>. Același tipar pentru toate trei metodele.</p>
+        </div>
+<pre><code data-lang="java">public static List&lt;Anunt&gt; filtreazaDisponibile(List&lt;Anunt&gt; sursa, double pretMaxim) {
+    List&lt;Anunt&gt; rezultat = new ArrayList&lt;&gt;();   // listă NOUĂ, sursa rămâne neatinsă
+    if (sursa == null) return rezultat;
+    for (Anunt a : sursa) {
+        if (a != null &amp;&amp; a.getCantitate() &gt; 0 &amp;&amp; a.getPret() &lt;= pretMaxim) {
+            rezultat.add(a);
+        }
+    }
+    return rezultat;
+}
+
+public static int numaraNoi(List&lt;Anunt&gt; sursa) {
+    int nr = 0;
+    if (sursa == null) return nr;
+    for (Anunt a : sursa) if (a != null &amp;&amp; a.isNou()) nr++;
+    return nr;
+}
+
+public static double valoareStoc(List&lt;Anunt&gt; sursa) {
+    double suma = 0;
+    if (sursa == null) return suma;
+    for (Anunt a : sursa) if (a != null &amp;&amp; a.getCantitate() &gt; 0) suma += a.getPret() * a.getCantitate();
+    return suma;
+}</code></pre>
+      </div>
+    </article>
+
+    <!-- P4 -->
+    <article class="req" id="p4">
+      <div class="req-head">
+        <div class="req-meta"><span class="eyebrow">Pasul 4 · Cerința 6</span><span class="pts">2p</span><span class="tst">R5_PreferinteTest</span></div>
+        <h3>SharedPreferences</h3>
+        <span class="path">persistenta/PreferinteService.java</span>
+      </div>
+      <div class="req-body">
+        <div class="block">
+          <span class="eyebrow">Ce faci</span>
+          <ul>
+            <li>Scriere: <code>edit()</code> → <code>putInt(...)</code> → <code>apply()</code>.</li>
+            <li>Citire: <code>getInt(cheie, 0)</code>. Al doilea parametru e valoarea întoarsă când cheia nu există.</li>
+            <li>Folosești constantele din clasă (<code>CHEIE_INCARCATE</code>, <code>CHEIE_NOI</code>), nu scrii cheile de mână.</li>
+          </ul>
+        </div>
+<pre><code data-lang="java">public static void salveazaStatistici(SharedPreferences prefs, int incarcate, int noi) {
+    prefs.edit()
+            .putInt(CHEIE_INCARCATE, incarcate)
+            .putInt(CHEIE_NOI, noi)
+            .apply();
+}
+
+public static int citesteNrIncarcate(SharedPreferences prefs) {
+    return prefs.getInt(CHEIE_INCARCATE, 0);
+}
+
+public static int citesteNrNoi(SharedPreferences prefs) {
+    return prefs.getInt(CHEIE_NOI, 0);
+}</code></pre>
+      </div>
+    </article>
+
+    <!-- P5 -->
+    <article class="req" id="p5">
+      <div class="req-head">
+        <div class="req-meta"><span class="eyebrow">Pasul 5 · Cerința 3</span><span class="pts">2p</span><span class="tst">R2_ParserJsonTest</span></div>
+        <h3>Parsare JSON</h3>
+        <span class="path">json/ParserJson.java</span>
+      </div>
+      <div class="req-body">
+<pre><code data-lang="java">List&lt;Anunt&gt; anunturi = new ArrayList&lt;&gt;();
+JSONArray jsonArray = new JSONArray(text);
+for (int i = 0; i &lt; jsonArray.length(); i++) {
+    JSONObject anunt = jsonArray.getJSONObject(i);
+    String titlu = anunt.getString("titlu");
+    if (titlu.trim().isEmpty()) continue;            // ignori DOAR titlul gol
+
+    String descriere = anunt.getString("descriere");
+    double pret = anunt.getDouble("pret");
+    int cantitate = anunt.getInt("cantitate");
+    Categorie cat = Categorie.valueOf(anunt.getString("categorie"));
+    LocalDate data = LocalDate.parse(anunt.getString("dataPublicare"));
+    boolean nou = anunt.optBoolean("nou", false);    // opțional: lipsă -&gt; false
+
+    anunturi.add(new Anunt(titlu, descriere, pret, cantitate, cat, nou, data));
+}
+return anunturi;</code></pre>
+        <div class="traps">
+          <span class="eyebrow">Capcane</span>
+          <ul>
+            <li>Cheile le copiezi exact din test sau din <code>assets/anunturi_demo.json</code>: e <code>"dataPublicare"</code>, nu <code>"data"</code>.</li>
+            <li>Pentru câmpuri opționale folosești <code>opt...</code> (<code>optBoolean</code>, <code>optString</code>). <code>get...</code> aruncă eroare dacă cheia lipsește.</li>
+            <li><code>return anunturi;</code> după <code>for</code>, altfel proiectul nu compilează.</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <!-- P6 -->
+    <article class="req" id="p6">
+      <div class="req-head">
+        <div class="req-meta"><span class="eyebrow">Pasul 6 · Cerința 4</span><span class="pts">2p</span><span class="tst">R3_ParserXmlTest</span></div>
+        <h3>Parsare XML (valori în elemente)</h3>
+        <span class="path">xml/ParserXml.java</span>
+      </div>
+      <div class="req-body">
+<pre><code data-lang="java">List&lt;Anunt&gt; anunturi = new ArrayList&lt;&gt;();
+DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+Document document = documentBuilder.parse(new InputSource(new StringReader(text)));
+NodeList nodeList = document.getElementsByTagName("anunt");
+for (int i = 0; i &lt; nodeList.getLength(); i++) {
+    Element anunt = (Element) nodeList.item(i);
+    String titlu = anunt.getElementsByTagName("titlu").item(0).getTextContent();
+    if (titlu.trim().isEmpty()) continue;
+
+    String descriere = anunt.getElementsByTagName("descriere").item(0).getTextContent();
+    double pret = Double.parseDouble(anunt.getElementsByTagName("pret").item(0).getTextContent());
+    int cantitate = Integer.parseInt(anunt.getElementsByTagName("cantitate").item(0).getTextContent().trim());
+    Categorie cat = Categorie.valueOf(anunt.getElementsByTagName("categorie").item(0).getTextContent().trim());
+    LocalDate data = LocalDate.parse(anunt.getElementsByTagName("dataPublicare").item(0).getTextContent().trim());
+
+    boolean nou = false;                               // &lt;nou&gt; e opțional
+    NodeList noduriNou = anunt.getElementsByTagName("nou");
+    if (noduriNou.getLength() &gt; 0) {
+        nou = Boolean.parseBoolean(noduriNou.item(0).getTextContent().trim());
+    }
+    anunturi.add(new Anunt(titlu, descriere, pret, cantitate, cat, nou, data));
+}
+return anunturi;</code></pre>
+        <div class="traps">
+          <span class="eyebrow">Capcane</span>
+          <ul>
+            <li>La un tag opțional, <code>item(0)</code> e <code>null</code> dacă tag-ul lipsește. Verifici întâi <code>getLength() &gt; 0</code>.</li>
+            <li><code>.trim()</code> înainte de <code>parseInt</code>, <code>valueOf</code> și <code>LocalDate.parse</code>, care crapă la spații. <code>Double.parseDouble</code> le taie singur.</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <!-- P7 -->
+    <article class="req" id="p7">
+      <div class="req-head">
+        <div class="req-meta"><span class="eyebrow">Pasul 7 · Cerința 11</span><span class="pts">2p</span><span class="tst">R10_BnrTest</span></div>
+        <h3>XML BNR (valuta e atribut)</h3>
+        <span class="path">bnr/CursBnrParser.java</span>
+      </div>
+      <div class="req-body">
+        <div class="block">
+          <span class="eyebrow">Cum alegi metoda</span>
+          <div class="io">
+            <div><span class="eyebrow">Valoarea e între tag-uri</span>
+<pre><code data-lang="xml">&lt;pret&gt;375.25&lt;/pret&gt;</code></pre>
+              <p><code>getElementsByTagName("pret").item(0).getTextContent()</code></p></div>
+            <div><span class="eyebrow">Valoarea e atribut</span>
+<pre><code data-lang="xml">&lt;Rate currency="EUR"&gt;5.0945&lt;/Rate&gt;</code></pre>
+              <p><code>getAttribute("currency")</code> pentru valută, <code>getTextContent()</code> pentru rată</p></div>
+          </div>
+        </div>
+<pre><code data-lang="java">public static double citesteCurs(String xml, String valuta) throws Exception {
+    Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+            .parse(new InputSource(new StringReader(xml)));
+    NodeList rate = document.getElementsByTagName("Rate");
+    for (int i = 0; i &lt; rate.getLength(); i++) {
+        Element rata = (Element) rate.item(i);
+        if (rata.getAttribute("currency").equals(valuta)) {
+            String text = rata.getTextContent().trim().replace(',', '.');   // acceptă și 5,1256
+            return Double.parseDouble(text);
+        }
+    }
+    return -1;   // valuta nu există
+}</code></pre>
+      </div>
+    </article>
+
+    <!-- P8 -->
+    <article class="req" id="p8">
+      <div class="req-head">
+        <div class="req-meta"><span class="eyebrow">Pasul 8 · Cerința 7 (logica)</span><span class="pts">2p</span><span class="tst">R6_FormularTest</span></div>
+        <h3>Validarea formularului</h3>
+        <span class="path">formular/FormularValidator.java</span>
+      </div>
+      <div class="req-body">
+        <div class="block">
+          <span class="eyebrow">Ce faci</span>
+          <ul>
+            <li>Un <code>HashMap</code> gol în care pui câte o eroare pentru fiecare câmp greșit.</li>
+            <li><strong>Nu dai <code>return</code> la prima eroare:</strong> fiecare câmp are <code>if</code>-ul sau <code>try</code>-ul lui.</li>
+            <li>Numerele, categoria și data le verifici cu <code>try/catch</code>: dacă parsarea aruncă eroare, textul e invalid.</li>
+          </ul>
+        </div>
+<pre><code data-lang="java">Map&lt;String, String&gt; erori = new HashMap&lt;&gt;();
+
+if (titlu == null || titlu.trim().isEmpty()) erori.put("titlu", "Titlul este obligatoriu");
+if (descriere == null || descriere.trim().length() &lt; 10) erori.put("descriere", "Minim 10 caractere");
+
+try {
+    double pret = Double.parseDouble(pretText.trim());
+    if (pret &lt;= 0) erori.put("pret", "Pretul trebuie sa fie mai mare ca 0");
+} catch (NullPointerException | NumberFormatException e) {
+    erori.put("pret", "Pretul trebuie sa fie un numar (ex. 10.5)");
+}
+
+try {
+    int cantitate = Integer.parseInt(cantitateText.trim());
+    if (cantitate &lt; 1 || cantitate &gt; 100) erori.put("cantitate", "Intre 1 si 100");
+} catch (NullPointerException | NumberFormatException e) {
+    erori.put("cantitate", "Cantitatea trebuie sa fie un numar intreg");
+}
+
+try {
+    Categorie.valueOf(categorieText.trim());
+} catch (NullPointerException | IllegalArgumentException e) {
+    erori.put("categorie", "Categorie invalida");
+}
+
+try {
+    LocalDate data = LocalDate.parse(dataText.trim());
+    if (data.isAfter(LocalDate.now())) erori.put("data", "Data nu poate fi in viitor");
+} catch (Exception e) {
+    erori.put("data", "Data trebuie sa fie de forma AAAA-LL-ZZ");
+}
+
+return erori;   // gol = totul e valid</code></pre>
+      </div>
+    </article>
+
+    <!-- P9 -->
+    <article class="req" id="p9">
+      <div class="req-head">
+        <div class="req-meta"><span class="eyebrow">Pasul 9 · Cerința 8</span><span class="pts">2p</span><span class="tst">R7_LayoutTest</span></div>
+        <h3>Layout-urile</h3>
+        <span class="path">res/layout/activity_add.xml · res/layout/item_anunt.xml</span>
+      </div>
+      <div class="req-body">
+        <div class="block">
+          <span class="eyebrow">Ce faci</span>
+          <ul>
+            <li>În <code>activity_add.xml</code> adaugi <code>inputType</code>: <code>numberDecimal</code> pe preț, <code>number</code> pe cantitate, <code>text</code> pe dată.</li>
+            <li>În <code>item_anunt.xml</code> adaugi două <code>TextView</code>-uri: <code>tvCategorie</code> și <code>tvCantitate</code>.</li>
+            <li>Id-urile trebuie să fie <strong>exact</strong> cele din enunț. Le poți pune și din <strong>Design → Attributes</strong>, vezi <a href="#interfata">mai jos</a>.</li>
+          </ul>
+        </div>
+<pre><code data-lang="xml">&lt;EditText android:id="@+id/etPret" android:layout_width="match_parent"
+    android:layout_height="wrap_content" android:hint="Preț"
+    android:inputType="numberDecimal" /&gt;
+&lt;EditText android:id="@+id/etCantitate" android:layout_width="match_parent"
+    android:layout_height="wrap_content" android:hint="Cantitate"
+    android:inputType="number" /&gt;
+
+&lt;!-- în item_anunt.xml, sub tvPret --&gt;
+&lt;TextView android:id="@+id/tvCategorie" android:layout_width="match_parent"
+    android:layout_height="wrap_content" android:text="Categorie" /&gt;
+&lt;TextView android:id="@+id/tvCantitate" android:layout_width="match_parent"
+    android:layout_height="wrap_content" android:text="Cantitate" /&gt;</code></pre>
+      </div>
+    </article>
+
+    <!-- P10 -->
+    <article class="req" id="p10">
+      <div class="req-head">
+        <div class="req-meta"><span class="eyebrow">Pasul 10 · Cerința 9</span><span class="pts">1p</span><span class="tst">R8_AdapterTest</span></div>
+        <h3>CustomAdapter cu ViewHolder</h3>
+        <span class="path">ui/AnuntAdapter.java</span>
+      </div>
+      <div class="req-body">
+        <div class="block">
+          <span class="eyebrow">Ideea</span>
+          <p>Lista refolosește rândurile care ies din ecran. Dacă <code>convertView</code> e <code>null</code>, creezi rândul și îi lipești un <code>ViewHolder</code> cu <code>setTag</code>. Altfel îl iei înapoi cu <code>getTag()</code> și doar schimbi textele.</p>
+        </div>
+<pre><code data-lang="java">@NonNull @Override
+public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+    ViewHolder holder;
+    if (convertView == null) {
+        convertView = LayoutInflater.from(context).inflate(R.layout.item_anunt, parent, false);
+        holder = new ViewHolder();
+        holder.tvTitlu = convertView.findViewById(R.id.tvTitlu);
+        holder.tvPret = convertView.findViewById(R.id.tvPret);
+        holder.tvCategorie = convertView.findViewById(R.id.tvCategorie);
+        holder.tvCantitate = convertView.findViewById(R.id.tvCantitate);
+        convertView.setTag(holder);
+    } else {
+        holder = (ViewHolder) convertView.getTag();
+    }
+
+    Anunt anunt = getItem(position);
+    if (anunt != null) {
+        holder.tvTitlu.setText(anunt.getTitlu());
+        holder.tvPret.setText("Preț: " + anunt.getPret() + " lei");
+        holder.tvCategorie.setText("Categorie: " + anunt.getCategorie());
+        holder.tvCantitate.setText("Cantitate: " + anunt.getCantitate());
+    }
+    return convertView;
+}</code></pre>
+        <div class="traps">
+          <span class="eyebrow">Capcană</span>
+          <p><code>setText</code> cu un <code>int</code> simplu, de exemplu <code>setText(anunt.getCantitate())</code>, compilează, dar crapă: Android crede că e id-ul unui text din resurse. Lipești mereu un text în față sau folosești <code>String.valueOf(...)</code>.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- P11 -->
+    <article class="req" id="p11">
+      <div class="req-head">
+        <div class="req-meta"><span class="eyebrow">Pasul 11 · Cerințele 10, 7 și 11 pe ecran</span><span class="pts">1p + manual</span><span class="tst">R9_NavigareTest</span></div>
+        <h3>Legarea ecranelor</h3>
+        <span class="path">MainActivity.java · AddActivity.java · BnrActivity.java</span>
+      </div>
+      <div class="req-body">
+        <div class="block">
+          <span class="eyebrow">MainActivity: în onCreate</span>
+<pre><code data-lang="java">binding.lvAnunturi.setAdapter(adapter);                         // lista primește adapterul
+binding.fabAdauga.setOnClickListener(v -&gt;
+        launcherAdauga.launch(new Intent(this, AddActivity.class)));
+
+int n = PreferinteService.citesteNrIncarcate(getPrefs());
+Toast.makeText(this, "Ultima încărcare: " + n, Toast.LENGTH_LONG).show();</code></pre>
+        </div>
+        <div class="block">
+          <span class="eyebrow">MainActivity: rezultatul de la formular</span>
+<pre><code data-lang="java">private final ActivityResultLauncher&lt;Intent&gt; launcherAdauga = registerForActivityResult(
+        new ActivityResultContracts.StartActivityForResult(), result -&gt; {
+            if (result.getResultCode() == RESULT_OK &amp;&amp; result.getData() != null) {
+                Anunt anunt = (Anunt) result.getData().getSerializableExtra(AddActivity.EXTRA_ANUNT);
+                if (anunt != null) {
+                    anunturi.add(anunt);
+                    adapter.notifyDataSetChanged();   // lista se redesenează
+                    actualizeazaStatistici();
+                }
+            }
+        });</code></pre>
+        </div>
+        <div class="block">
+          <span class="eyebrow">MainActivity: meniul</span>
+<pre><code data-lang="java">@Override public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    int id = item.getItemId();
+    try {
+        if (id == R.id.action_json) { importa(ParserJson.dinText(citesteAsset("anunturi_demo.json"))); return true; }
+        if (id == R.id.action_xml)  { importa(ParserXml.dinText(citesteAsset("anunturi_demo.xml")));   return true; }
+    } catch (Exception e) {
+        Toast.makeText(this, "Eroare la import: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        return true;
+    }
+    if (id == R.id.action_bnr)  { startActivity(new Intent(this, BnrActivity.class));  return true; }
+    if (id == R.id.action_info) { startActivity(new Intent(this, InfoActivity.class)); return true; }
+    return super.onOptionsItemSelected(item);
+}
+
+// importul ÎNLOCUIEȘTE lista și salvează statisticile importului
+private void importa(List&lt;Anunt&gt; importate) {
+    anunturi.clear();
+    anunturi.addAll(importate);
+    adapter.notifyDataSetChanged();
+    PreferinteService.salveazaStatistici(getPrefs(), importate.size(), AnunturiService.numaraNoi(importate));
+    actualizeazaStatistici();
+}
+
+private SharedPreferences getPrefs() {
+    return getSharedPreferences(PreferinteService.PREFS_NAME, MODE_PRIVATE);
+}</code></pre>
+          <p>Folosești <code>if</code>, nu <code>switch</code>: în versiunile noi de Android, <code>R.id.ceva</code> nu mai e constantă și un <code>switch</code> pe ea nu compilează.</p>
+        </div>
+        <div class="block">
+          <span class="eyebrow">AddActivity: butonul Salvează</span>
+<pre><code data-lang="java">private void salveaza() {
+    String titlu = binding.etTitlu.getText().toString();
+    String descriere = binding.etDescriere.getText().toString();
+    String pretText = binding.etPret.getText().toString();
+    String cantitateText = binding.etCantitate.getText().toString();
+    String categorieText = String.valueOf(binding.spCategorie.getSelectedItem());
+    String dataText = binding.etData.getText().toString();
+
+    Map&lt;String, String&gt; erori = FormularValidator.erori(titlu, descriere,
+            pretText, cantitateText, categorieText, dataText);
+
+    binding.etTitlu.setError(erori.get("titlu"));          // null șterge eroarea veche
+    binding.etDescriere.setError(erori.get("descriere"));
+    binding.etPret.setError(erori.get("pret"));
+    binding.etCantitate.setError(erori.get("cantitate"));
+    binding.etData.setError(erori.get("data"));
+    if (!erori.isEmpty()) return;                           // NU continui dacă sunt erori
+
+    Anunt anunt = new Anunt(titlu.trim(), descriere.trim(),
+            Double.parseDouble(pretText.trim()), Integer.parseInt(cantitateText.trim()),
+            Categorie.valueOf(categorieText), binding.chkNou.isChecked(),
+            LocalDate.parse(dataText.trim()));
+
+    Intent intent = new Intent();
+    intent.putExtra(EXTRA_ANUNT, anunt);                    // merge pentru că Anunt e Serializable
+    setResult(RESULT_OK, intent);
+    finish();                                               // închide ecranul, te întoarce în listă
+}</code></pre>
+        </div>
+        <div class="block">
+          <span class="eyebrow">BnrActivity: butonul de citire</span>
+<pre><code data-lang="java">binding.btnCitesteCurs.setOnClickListener(v -&gt; {
+    try {
+        String xml = citesteAsset("curs_bnr_demo.xml");      // aceeași metodă ca în MainActivity
+        double curs = CursBnrParser.citesteCurs(xml, "EUR");
+        if (curs &lt; 0) Toast.makeText(this, "EUR nu exista in fisier", Toast.LENGTH_SHORT).show();
+        else binding.tvCurs.setText("1 EUR = " + curs + " RON");
+    } catch (Exception e) {
+        Toast.makeText(this, "Eroare: " + e.getMessage(), Toast.LENGTH_LONG).show();
+    }
+});</code></pre>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- TOAST -->
+  <section id="toast" aria-labelledby="h-toast">
+    <span class="eyebrow">Android</span>
+    <h2 id="h-toast">Cum faci un Toast</h2>
+    <p class="prose">Toast-ul e mesajul mic care apare jos pe ecran câteva secunde și dispare singur.</p>
+    <ol class="steps">
+      <li>Sus în fișier ai nevoie de <code>import android.widget.Toast;</code>. Dacă scrii <code>Toast</code> și se face roșu, apeși <kbd>Alt</kbd>+<kbd>Enter</kbd> și ți-l adaugă singur.</li>
+      <li>Scrii linia acolo unde vrei să apară mesajul:</li>
+    </ol>
+<pre><code data-lang="java">Toast.makeText(this, "Salut!", Toast.LENGTH_SHORT).show();</code></pre>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>Bucată</th><th>Ce înseamnă</th></tr></thead>
+        <tbody>
+          <tr><td><code>this</code></td><td>activitatea în care ești (contextul)</td></tr>
+          <tr><td><code>"Salut!"</code></td><td>textul; îl poți lipi cu variabile: <code>"Ultima încărcare: " + n</code></td></tr>
+          <tr><td><code>LENGTH_SHORT</code> / <code>LENGTH_LONG</code></td><td>cam 2 secunde / cam 3,5 secunde</td></tr>
+          <tr><td><code>.show()</code></td><td><strong>obligatoriu</strong>: fără el Toast-ul nu apare</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="block">
+      <span class="eyebrow">Unde îl pui</span>
+<pre><code data-lang="java">// 1. la pornirea ecranului: în onCreate, după setContentView(...)
+Toast.makeText(this, "Ecran pornit", Toast.LENGTH_SHORT).show();
+
+// 2. la apăsarea unui buton
+binding.btnSalveaza.setOnClickListener(v -&gt; {
+    Toast.makeText(this, "Ai apăsat Salvează", Toast.LENGTH_SHORT).show();
+});
+
+// 3. în adapter (acolo this nu e o activitate)
+Toast.makeText(getContext(), "Mesaj", Toast.LENGTH_SHORT).show();
+
+// 4. într-o clasă anonimă (new View.OnClickListener() { ... }) scrii numele activității
+Toast.makeText(MainActivity.this, "Mesaj", Toast.LENGTH_SHORT).show();</code></pre>
+    </div>
+  </section>
+
+  <!-- INTERFATA -->
+  <section id="interfata" aria-labelledby="h-ui">
+    <span class="eyebrow">Android Studio</span>
+    <h2 id="h-ui">Cum vezi interfața unei activități</h2>
+
+    <h3>Varianta A: în editor, fără să pornești aplicația</h3>
+    <ol class="steps">
+      <li>Afli ce layout are activitatea, uitându-te în <code>onCreate</code>. Dacă scrie <code>ActivityAddBinding.inflate(...)</code>, layout-ul e <code>activity_add.xml</code>: numele se citește invers. Dacă scrie <code>setContentView(R.layout.activity_add)</code>, numele e chiar acolo.</li>
+      <li><kbd>Ctrl</kbd>+click pe <code>ActivityAddBinding</code> sau pe <code>R.layout.activity_add</code> și se deschide XML-ul. Altfel îl găsești în panoul din stânga, la <strong>app → res → layout</strong>.</li>
+      <li>În colțul din dreapta sus al editorului ai trei butoane mici: <strong>Code</strong>, <strong>Split</strong>, <strong>Design</strong>. <strong>Split</strong> e cel mai util: codul în stânga, ecranul desenat în dreapta. Dai click pe un element din desen și te duce la linia lui din XML.</li>
+      <li>Când ai selectat un element, în dreapta apare panoul <strong>Attributes</strong>. Acolo îi schimbi <code>id</code>, <code>text</code>, <code>inputType</code> fără să scrii XML. Din <strong>Palette</strong>, în stânga, tragi elemente noi pe ecran.</li>
+    </ol>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>Activitate</th><th>Layout</th><th>Ce e pe ecran</th></tr></thead>
+        <tbody>
+          <tr><td><code>MainActivity</code></td><td><code>activity_main.xml</code></td><td>bara de sus, statistici, lista, butonul +</td></tr>
+          <tr><td><code>AddActivity</code></td><td><code>activity_add.xml</code></td><td>formularul</td></tr>
+          <tr><td><code>BnrActivity</code></td><td><code>activity_bnr.xml</code></td><td>cursul EUR și butonul de citire</td></tr>
+          <tr><td><code>InfoActivity</code></td><td><code>activity_info.xml</code></td><td>textul „Despre”</td></tr>
+          <tr><td>un rând din listă</td><td><code>item_anunt.xml</code></td><td>titlu, preț, categorie, cantitate</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Varianta B: aplicația pornită, pe emulator</h3>
+    <ol class="steps">
+      <li><strong>View → Tool Windows → Device Manager</strong>.</li>
+      <li><strong>+</strong> → <strong>Create Virtual Device</strong> → alegi un telefon (de exemplu Pixel 8) → <strong>Next</strong>.</li>
+      <li>Alegi o imagine de sistem (de exemplu API 36) și apeși săgeata de download de lângă ea. Are 1–2 GB, durează câteva minute.</li>
+      <li><strong>Next → Finish</strong>.</li>
+      <li>Sus, în bara de unelte, alegi emulatorul din listă și apeși <strong>▶ Run 'app'</strong> (<kbd>Shift</kbd>+<kbd>F10</kbd>).</li>
+    </ol>
+    <div class="callout">
+      <strong>În aplicația pornită</strong>
+      <ul>
+        <li><strong>+</strong> din dreapta jos deschide formularul (<code>AddActivity</code>).</li>
+        <li><strong>⋮</strong> din dreapta sus: <strong>Importă JSON</strong>, <strong>Importă XML</strong>, <strong>Curs BNR</strong> (<code>BnrActivity</code>), <strong>Despre</strong> (<code>InfoActivity</code>).</li>
+        <li>Butonul înapoi al telefonului te întoarce în listă.</li>
+      </ul>
+    </div>
+    <p class="prose">În cod, o activitate se deschide cu un <code>Intent</code>: <code>startActivity(new Intent(this, BnrActivity.class));</code> doar o deschide, iar <code>launcher.launch(new Intent(this, AddActivity.class));</code> o deschide și așteaptă un rezultat.</p>
+  </section>
+
+  <!-- TESTE -->
+  <section id="teste" aria-labelledby="h-teste">
+    <span class="eyebrow">Verificare</span>
+    <h2 id="h-teste">Cum rulezi testele</h2>
+    <div class="io">
+      <div>
+        <span class="eyebrow">Cu click</span>
+        <ul class="prose">
+          <li>Toate: click dreapta pe <code>ro.ase.dam.examen (test)</code> → <strong>Run 'Tests in…'</strong>.</li>
+          <li>Una: deschizi testul și apeși ▶ lângă <code>public class ...</code>.</li>
+          <li>Jos, în fereastra <strong>Run</strong>: bifă verde = trece, X roșu = pică. Click pe X arată <em>Expected</em> și <em>Actual</em>.</li>
+        </ul>
+      </div>
+      <div>
+        <span class="eyebrow">Din terminal (Alt+F12)</span>
+<pre><code>Remove-Item -Recurse -Force app\build -ErrorAction SilentlyContinue; .\gradlew :app:testDebugUnitTest</code></pre>
+        <p class="prose">Ștergerea lui <code>app\build</code> rezolvă eroarea de la OneDrive și forțează testele să ruleze din nou.</p>
+      </div>
+    </div>
+    <div class="result">R0_ModelTest &gt; r0a_constructorSiGetters <span class="ok">PASSED</span>
+R1_ValidatorTest &gt; r1a_nullSiText <span class="ok">PASSED</span>
+…
+R10_BnrTest &gt; r10b_lipsaSiVirgulaZecimala <span class="ok">PASSED</span>
+========================================
+PUNCTAJ ESTIMAT: <span class="ok">20.0 / 20.0</span>
+========================================</div>
+    <p class="prose">Testele R7, R8 și R9 verifică doar că există codul și id-urile, nu că ecranele merg. De asta pornești și aplicația pe emulator. Punctajul e orientativ: la examen se mai uită cineva și pe cod.</p>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section id="checklist" aria-labelledby="h-check">
+    <span class="eyebrow">La examen</span>
+    <h2 id="h-check">Checklist</h2>
+    <ul class="check">
+      <li>Proiectul compilează înainte să începi (altfel: <code>compileSdk</code>, <code>app/build</code>).</li>
+      <li>M-am uitat în teste la chei, tag-uri și atribute înainte să scriu parserele.</li>
+      <li>Constructorul e generat cu <kbd>Alt</kbd>+<kbd>Insert</kbd>; modelul e <code>Serializable</code>.</li>
+      <li>Nicio metodă nu a rămas fără <code>return</code>.</li>
+      <li>Parserele sar <strong>doar</strong> peste titlul gol și pun <code>false</code> când <code>nou</code> lipsește.</li>
+      <li>Validatorul de formular nu se oprește la prima eroare.</li>
+      <li>Id-urile din layout sunt exact cele din enunț; preț <code>numberDecimal</code>, cantitate <code>number</code>.</li>
+      <li>Adapterul are <code>convertView == null</code>, <code>setTag</code>, <code>getTag</code>, <code>setText</code>.</li>
+      <li>Meniul folosește <code>if (id == R.id....)</code>; după orice schimbare a listei, <code>notifyDataSetChanged()</code>.</li>
+      <li>Toate testele dau <strong>20.0 / 20.0</strong>, iar aplicația pornește pe emulator.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <p>Model de antrenament, neoficial. Punctajul afișat de teste e orientativ.</p>
+    <p><a href="./">← Înapoi la primul ghid (Proba 1)</a></p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  var javaRe = /(\/\/[^\n]*)|("(?:\\.|[^"\\\n])*")|('(?:\\.|[^'\\])')|\b(public|private|protected|static|final|class|return|if|else|for|while|new|try|catch|throws|throw|int|double|boolean|void|null|true|false|this|implements|extends|import|package|continue|super)\b|\b(\d+(?:\.\d+)?)\b|(@\w+)|\b([A-Z]\w*)\b/g;
+  var xmlRe = /(<!--[\s\S]*?-->)|(<\/?[\w.:]+|\/?>)|([\w:]+)(?==)|("[^"]*")/g;
+  function hl(src, re, cls) {
+    var out = '', last = 0, m;
+    re.lastIndex = 0;
+    while ((m = re.exec(src)) !== null) {
+      if (m[0] === '') { re.lastIndex++; continue; }
+      out += esc(src.slice(last, m.index));
+      var c = '';
+      for (var g = 1; g < m.length; g++) { if (m[g] !== undefined) { c = cls[g - 1]; break; } }
+      out += c ? '<span class="' + c + '">' + esc(m[0]) + '</span>' : esc(m[0]);
+      last = re.lastIndex;
+    }
+    return out + esc(src.slice(last));
+  }
+  var codes = document.querySelectorAll('pre code[data-lang]');
+  for (var i = 0; i < codes.length; i++) {
+    var el = codes[i], src = el.textContent;
+    el.innerHTML = el.getAttribute('data-lang') === 'xml'
+      ? hl(src, xmlRe, ['c', 'k', 'a', 's'])
+      : hl(src, javaRe, ['c', 's', 's', 'k', 'n', 'a', 't']);
+  }
+})();
+</script>
+</body>
+</html>
